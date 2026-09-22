@@ -20,3 +20,16 @@
 }"><br>
 
 <div id="myDiv01">...</div>
+
+<br><br><br>
+<input id="myNum01" type=number value="4" ><br>
+<input id="myNum02" type=number value="6" ><br>
+
+<input type=button value="myEvent multiply" onclick="{
+  let myIn01 = parseFloat(document.getElementById('myNum01').value)
+  let myIn02 = parseFloat(document.getElementById('myNum02').value)
+  let myAnswer = myIn01 * myIn02
+  document.getElementById('myDiv02').innerHTML = myIn01 + ' multiplied by ' myIn02 + ' = ' + myAnswer
+}"><br>
+
+<div id="myDiv02">...</div>
