@@ -19,3 +19,13 @@ Note: !=Not,  &&=And, ||=Or
     document.getElementById('myDiv01').innerHTML = myIn01 + ' is greater than 3'
   }
 }">
+
+<input type=Button value="complex if" onclick="{
+  let myIn01 = parseFloat(document.getElementById('myNum01').value)
+  if ((myIn01 != 3 || myIn01 > -3) && myIn01 <=100 ) {
+      document.getElementById('myDIv01').inneHTML = myIn01 + ' is complex '
+  } else {
+      document.getElementById('myDiv01').innerHTML = myIn01 + 'is not comple' }
+}">
+
+<div id="myDiv01">...</div>
