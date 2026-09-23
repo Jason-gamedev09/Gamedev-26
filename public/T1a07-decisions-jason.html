@@ -20,6 +20,14 @@ Note: !=Not,  &&=And, ||=Or
   }
 }">
 
+<input type=Button value="if...else" onclick="{
+  let my In01 = parseFloat(document.getElementById('myNum01').value)
+  if (myIn01 >= 3){
+      document.getElementById('myDIv01').innerHTML = myIn01 + 'is grater then 3'
+  }
+
+
+    
 <input type=Button value="complex if" onclick="{
   let myIn01 = parseFloat(document.getElementById('myNum01').value)
   if ((myIn01 != 3 || myIn01 > -3) && myIn01 <=100 ) {
