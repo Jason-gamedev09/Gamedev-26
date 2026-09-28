@@ -31,5 +31,11 @@
   let myAnswer = myIn02 * myIn03
   document.getElementById('myDiv02').innerHTML = myIn02 + ' multiplied by ' + myIn03 + ' = ' + myAnswer
 }"><br>
+<input type=button value="myEvent divide" onclick="{
+  let myIn02 = parseFloat(document.getElementById('myNum02').value)
+  let myIn03 = parseFloat(document.getElementById('myNum03').value)
+  let myAnswer = myIn02 / myIn03
+  document.getElementById('myDiv02').innerHTML = myIn02 + ' divided by ' + myIn03 + ' = ' + myAnswer
+}">
 
 <div id="myDiv02">...</div>
