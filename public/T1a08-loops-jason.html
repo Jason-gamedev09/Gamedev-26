@@ -1,1 +1,23 @@
-<h2 align=center>T1a08-loops-jason.html
+<h2 align=center>T1a08-loops-jason.html</h2>
+
+<h4> Example input output code</h4>
+<pre>
+  for (let myLoop = 0; myLoop < myMax; myLoop++ ){
+      // your code
+    }
+</pre>
+
+<h4> Example working </h4>
+
+Max loops: <input id="myNum01" type=number value="4" ><br>
+werid number: <input id="myWerid" type=number value="2" ><br>
+
+<input type=button value="Basic For Loop with Decisions" onclick="{
+  document.getElementById('myDiv01').innerHTML = ''
+  let myTempl = ''
+  let myMax = parseInt(document.getElementById('myNum01').value)
+
+  for (let myLoop = 0; myLoop < myMax; myLoop++ ){
+    if (myLoop * 2 > myMax){
+        mytemp += ' cool '
+  }
