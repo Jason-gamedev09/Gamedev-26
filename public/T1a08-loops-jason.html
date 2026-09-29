@@ -14,12 +14,12 @@ werid number: <input id="myWerid" type=number value="2" ><br>
 
 <input type=button value="Basic For Loop with Decisions" onclick="{
   document.getElementById('myDiv01').innerHTML = ''
-  let myTempl = ''
+  let myTemp = ''
   let myMax = parseInt(document.getElementById('myNum01').value)
 
   for (let myLoop = 0; myLoop < myMax; myLoop++ ){
     if (myLoop * 2 > myMax){
-        mytemp += ' cool '
+        myTemp += ' cool '
     }
    myTemp += 'Loop number: ' + myLoop + '<br>'
  }
