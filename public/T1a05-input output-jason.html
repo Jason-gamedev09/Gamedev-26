@@ -44,3 +44,23 @@
 }">
 
 <div id="myDiv02">...</div>
+<br><br><br>
+
+<h4>Heres addition and subtraction</h4>
+<input id="myNum04" type=number value="6" ><br>
+<input id="myNum05" type=number value="6" ><br>
+
+<input type=button value="Addition" onclick="{
+  let myIn04 = parseFloat(document.getElementById('myNum04').value)
+  let myIn05 = parseFloat(document.getElementById('myNum05').value)
+  let myAnswer = myIn04 + myIn05
+  document.getElementById('myDiv03').innerHTML = myIn04 + ' plus ' + myIn05 + ' = ' + myAnswer
+}"><br>
+<input type=button value="Subtraction" onclick="{
+  let myIn04 = parseFloat(document.getElementById('myNum04').value)
+  let myIn05 = parseFloat(document.getElementById('myNum05').value)
+  let myAnswer = myIn04 - myIn05
+  document.getElementById('myDiv03').innerHTML = myIn04 + ' minus ' + myIn05 + ' = ' + myAnswer
+}">
+
+<div id="myDiv03">...</div>
