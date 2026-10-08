@@ -48,6 +48,14 @@
   top:0; width:200; height:50; ">
 </textarea><br>
 
+<p id='myText'; style="font-family:verdana">This Font Changes</p>
+<input type="button" value="change font" onclick="{
+let fontType= document.getElementById('myText')
+if (fontType.style.fontFamily == 'Areial') {
+	fontType.style.fontFamily = 'verdana'}
+ else {fontType.style.fontFamily = 'Areial'}
+ }">
+
 <br><br><br>
 
 </body>
