@@ -21,3 +21,17 @@ Events activate code
   You do least 8 other events:<br>
   onCLick, onDBclick, onCHange, onBlur, onFocus, orMouseMove, onTouch onKeyDown,
   onKeyPRess, onDragStart, onTouchStart, onTouchEnd, onTouchMove
+
+<h3>Heres some more cool stuff</h3>  
+<h4>Live Character Counter</h4>
+ <textarea id="typingBox" rows="4" placeholder="Start typing here..."></textarea>
+ <div class="counter">Characters: <span id="count">0</span></div>
+
+ <script>
+   const typingBox = document.getElementById('typingBox');
+   const count = document.getElementById('count');
+    typingBox.addEventListener('input', (e) => {
+      count.textContent = e.target.value.length;
+    });
+  </script>
+<br><br>
