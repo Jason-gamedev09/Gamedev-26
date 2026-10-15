@@ -63,3 +63,19 @@ Max Array Entry: <input type=number id="myText01" value="3"><br>
 
     filterProducts();
   </script>
+<br><br><br>
+<h4>Here is a random word generator</h4>
+<h1>Random Color Generator</h1>  
+  <p id="output">Click the button to pick a color</p>
+
+  <button onclick="pickRandom()">Pick Random</button>
+
+<script>
+
+    const colors = ["Red", "Blue", "Green", "Yellow", "Purple"];
+
+    function pickRandom() {    
+      const randomWord = colors[Math.floor(Math.random() * colors.length)];     
+      document.getElementById("output").innerText = randomWord;
+    }
+</script>
