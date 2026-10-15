@@ -35,3 +35,14 @@ Events activate code
     });
   </script>
 <br><br>
+
+<h4>Random Background Color Changer</h4>
+<button id="colorBtn">Change Theme</button>
+
+<script>
+  const button = document.getElementById('colorBtn');
+  button.addEventListener('click', () => {
+    const randomColor = Math.floor(Math.random()*16777215).toString(16);
+    document.body.style.backgroundColor = "#" + randomColor;
+  });
+</script>
