@@ -34,4 +34,20 @@ function changeTheme(colorCode) {
 }
 </script>
 <br><br><br>
-<h4> </h4>
+<h4>Autocomplete Search Box With An Alert</h4>
+<input list="browsers" id="browserInput" placeholder="Search a browser...">
+<datalist id="browsers">
+  <option value="Google Chrome">
+  <option value="Mozilla Firefox">
+  <option value="Safari">
+  <option value="Microsoft Edge">
+</datalist>
+<button onclick="launchSearch()">Go</button>
+
+<script>
+function launchSearch() {
+    const choice = document.getElementById('browserInput').value;
+    alert("Searching our database for your choice: " + choice);
+}
+</script>
+<br><br><br>
