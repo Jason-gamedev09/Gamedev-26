@@ -41,3 +41,28 @@ werid number: <input id="myWerid" type=number value="2" ><br>
 }">
 
 <div id="myDiv01"><font color=red>...</font></div>
+
+<h4> More Cool Stuff </h4>
+<h3> Matrix type code falling visual: </h3>
+	<textarea id="box" rows="10" cols="30" style="background:black; color:green; font-family:monospace;"></textarea>
+
+  <script>
+    const txt = document.getElementById("box");
+    // A string containing the characters the loop can pick from
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+    setInterval(() => {
+      let line = "";
+      
+      for (let i = 0; i < 20; i++) {
+        if (Math.random() > 0.7) {
+          // Loop picks a completely random letter or number from our string
+          line += chars.charAt(Math.floor(Math.random() * chars.length));
+        } else {
+          line += " ";
+        }
+      }
+      
+      txt.value = line + "\n" + txt.value;
+    }, 100);
+  </script>
