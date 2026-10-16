@@ -21,3 +21,15 @@ Info can also be passed to functions (thats advanced)
 }">
 
 <div id="myDiv01">...</div>
+
+<h3>More cool Functions</h3>
+<h4>Background color picker and changer</h4>
+
+<label for="themeColor">Choose a background color:</label>
+<input type="color" id="themeColor" oninput="changeTheme(this.value)">
+
+<script>
+function changeTheme(colorCode) {
+    document.body.style.backgroundColor = colorCode;
+}
+</script>
