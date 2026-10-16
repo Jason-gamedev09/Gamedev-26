@@ -44,25 +44,38 @@ werid number: <input id="myWerid" type=number value="2" ><br>
 
 <h4> More Cool Stuff </h4>
 <h3> Matrix type code falling visual: </h3>
-	<textarea id="box" rows="10" cols="30" style="background:black; color:green; font-family:monospace;"></textarea>
+<!DOCTYPE html>
+<html>
+<body>
+
+  <textarea id="box" rows="12" cols="45" style="background:#1e1e1e; color:#4fc1ff; font-family:monospace; font-size:14px; padding:10px;"></textarea>
 
   <script>
     const txt = document.getElementById("box");
-    // A string containing the characters the loop can pick from
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    
+    // A list of real code snippets for the loop to pick from
+    const snippets = [
+      "let", "const", "function()", "for(let i=0;)", "if(true)", "return;", 
+      "console.log()", "<div>", "</div>", "<html>", "<script>", "document.", 
+      "fetch()", ".addEventListener", "=>", "class", "import", "export"
+    ];
 
     setInterval(() => {
       let line = "";
       
-      for (let i = 0; i < 20; i++) {
-        if (Math.random() > 0.7) {
-          // Loop picks a completely random letter or number from our string
-          line += chars.charAt(Math.floor(Math.random() * chars.length));
-        } else {
-          line += " ";
-        }
+      // This loop builds a line using 3 random code blocks
+      for (let i = 0; i < 3; i++) {
+        let randomCode = snippets[Math.floor(Math.random() * snippets.length)];
+        line += randomCode + " ";
       }
       
-      txt.value = line + "\n" + txt.value;
-    }, 100);
+      // Keeps the box from getting infinitely long by cutting old text
+      let lines = txt.value.split("\n");
+      if (lines.length > 11) lines.pop(); 
+      
+      txt.value = line + "\n" + lines.join("\n");
+    }, 200);
   </script>
+
+</body>
+</html>
