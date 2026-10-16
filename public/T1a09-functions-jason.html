@@ -51,4 +51,17 @@ function launchSearch() {
     alert("Searching our database for your choice: " + choice);
 }
 </script>
-<br><br><br>
+<br>
+
+<h4>Textbox With A Max Character Count Plus Warning</h4>
+<textarea id="textInput" oninput="updateCounter()"></textarea>
+  <p id="counter">0 / 50</p>
+
+  <script>
+    function updateCounter() {
+      const input = document.getElementById("textInput");
+      const counter = document.getElementById("counter");
+      counter.textContent = input.value.length + " / 50";
+      counter.style.color = input.value.length > 50 ? "red" : "black";
+    }
+  </script>
