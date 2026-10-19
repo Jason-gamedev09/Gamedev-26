@@ -1,4 +1,4 @@
-<h2 alighn=center>T1a12-objects-jason.html</h2>
+<h2 align=center>T1a12-objects-jason.html</h2>
 <script>
 //What might be a good idea to declare here?
 </script>
@@ -9,23 +9,31 @@ Objects are store named varibles
 <h4> Example working Objects code</h4>
 
 Nothing; <input type=text id="myText01" value="useless at the moment"><br>
-
-<input type=button value="Example Object Set and SHow" onclick="{
-
-  let myPerson = {
+<script>
+	let myPerson = {
     'firstName' : 'John',
     'lastName'  : 'Doe',
     'age'       : 50,
-    'eyeColor   : 'Blue'
+    'eyeColor'  : 'Blue'
   }
-
-    document.getElementById('myDiv01').innerHTML = '<br>myPerson Object has
-  properties: <br>'
+</script>
+<input type=button value="Example Object Set and Show" onclick="{
+	document.getElementById('myDiv01').innerHTML = '<br>myPerson Object has properties: <br>'
+    
     document.getElementById('myDiv01').innerHTML += 'firstname: ' +
   myPerson.firstName + '<br>'
-    document.getElementById('myDiv01').innerHTML =+ 'You do the others <br> '
+    
+    document.getElementById('myDiv01').innerHTML += 'You do the others <br> '
   }">
-
-  <div id='myDiv01'>...</div>
-
+<input type=button value="THE O T H E R S" onclick="{
+document.getElementById('myDiv02').innerHTML = 'lastname: ' +
+  myPerson.lastName + '<br>'
+document.getElementById('myDiv02').innerHTML += 'age: ' +
+  myPerson.age + '<br>'
+document.getElementById('myDiv02').innerHTML += 'eyecolor: ' +
+  myPerson.eyeColor + '<br>'
+ }">
+ 
+<div id='myDiv01'>...</div>
+<div id='myDiv02'>...</div>
   
