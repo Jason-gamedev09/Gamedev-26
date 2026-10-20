@@ -36,3 +36,41 @@ Note: !=Not,  &&=And, ||=Or
 }">
 
 <div id="myDiv01">...</div>
+
+<h3>Other Cool Things</h3>
+<h4>Password Security Checker</h4>
+
+    <input type="text" id="myInput" oninput="checkPassword(this.value)">
+    
+    <p id="statusText" style="color: gray;">Status: Empty</p>
+
+    <script>
+        function checkPassword(password) {
+            const textElement = document.getElementById("statusText");
+            
+            if (password.length === 0) {
+                textElement.innerText = "Status: Empty";
+                textElement.style.color = "gray";
+            } 
+           
+            else if (password.length < 5) {
+                textElement.innerText = "Status: Weak ❌";
+                textElement.style.color = "red";
+            } 
+            
+            else if (password.length == 5) {
+                textElement.innerText = "Status: Medium Risk";
+                textElement.style.color = "orange";
+            } 
+            
+            else if (password.length == 10) {
+                textElement.innerText = "Status: Strong  Safe!";
+                textElement.style.color = "green";
+            }
+            
+            else if (password.length > 15) {
+                textElement.innerText = "Status: Militry Grade";
+                textElement.style.color = "#24AEFF";
+            }
+        }
+    </script>
