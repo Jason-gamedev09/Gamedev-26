@@ -84,3 +84,17 @@ werid number: <input id="myWerid" type=number value="2" ><br>
   }
 </script>
 
+<h3>Randomly Generated Art</h3>
+<canvas id="artCanvas" width="400" height="400" style="background: black;"></canvas>
+
+ <script>
+  const ctx = document.getElementById('artCanvas').getContext('2d');
+ 
+  for (let i = 0; i < 50; i++) {
+    
+    ctx.fillStyle = `hsl(${Math.random() * 360}, 100%, 50%)`;
+    
+    
+    ctx.fillRect(Math.random() * 400, Math.random() * 400, 30, 30);
+  }
+</script>
