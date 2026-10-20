@@ -85,10 +85,14 @@ werid number: <input id="myWerid" type=number value="2" ><br>
 </script>
 
 <h3>Randomly Generated Art</h3>
+
 <canvas id="artCanvas" width="400" height="400" style="background: black;"></canvas>
 
  <script>
+ function drawArt() {
   const ctx = document.getElementById('artCanvas').getContext('2d');
+  
+  ctx.clearRect(0, 0, 400, 400);
  
   for (let i = 0; i < 50; i++) {
     
@@ -97,4 +101,7 @@ werid number: <input id="myWerid" type=number value="2" ><br>
     
     ctx.fillRect(Math.random() * 400, Math.random() * 400, 30, 30);
   }
+ }
 </script>
+
+<input type=button value="reset" onclick="drawArt()">
