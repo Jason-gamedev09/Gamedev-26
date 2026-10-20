@@ -66,3 +66,20 @@ werid number: <input id="myWerid" type=number value="2" ><br>
       txt.value = line + "\n" + lines.join("\n");
     }, 70);
   </script>
+
+<h3>Fillable Grid</h3>
+<div id="grid" style="display: grid; grid-template-columns: repeat(10, 30px); gap: 2px;"></div>
+
+<script>
+  const grid = document.getElementById('grid');
+ 
+  for (let i = 0; i < 100; i++) {
+    const square = document.createElement('div');      
+    
+    square.style.cssText = "width: 30px; height: 30px; background: #eee;";   
+    
+    square.onmouseover = () => square.style.background = 'black';
+    
+    grid.appendChild(square);
+  }
+</script>
