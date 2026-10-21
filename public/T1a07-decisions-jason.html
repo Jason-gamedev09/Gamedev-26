@@ -106,3 +106,36 @@ Note: !=Not,  &&=And, ||=Or
       document.getElementById("health").innerText = health;
     }
   </script>
+
+<h4>Temperature Based CLothing Advisor</h4>
+
+<input type="number" id="temp" placeholder="Enter temperature">
+<button onclick="checkWeather()">Check</button>
+
+<p id="result"></p>
+
+<script>
+function checkWeather() {
+
+  const currentTemp = document.getElementById('temp').value;
+  const output = document.getElementById('result');
+   if (currentTemp <= -1000){
+    output.innerText = "💀";
+  } else if (currentTemp >= 1000){
+    output.innerText = "💀";
+  } else if(currentTemp <= -100) {
+    output.innerText = "Your might be dead.";
+  } else if (currentTemp >= 50){
+    output.innerText = "Your might be dead";
+  } else if (currentTemp > 15){
+    output.innerText = "It's warm! A T-shirt is fine.";
+  } else if (currentTemp < 10){
+    output.innerText = "It's Cold! Wear a jacket.";
+  } else if (currentTemp <= -1000){
+    output.innerText = "💀";
+  } else if (currentTemp >= 1000){
+    output.innerText = "💀";
+  }
+}
+</script>
+<pre> try -100 or below, 50 or higher, and both -1000 and +1000 and any normal temperature we experience ie -10 to 35</pre>
