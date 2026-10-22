@@ -6,6 +6,7 @@
   <style>
     b { color: blue; }
   </style>
+//Function say hello
   <script>
       function sayHello() {
         myInteger = 3;
@@ -15,12 +16,48 @@
         myOut = document.getElementById('myDiv01');
         myOut.innerHTML = myInteger + myString + myFloat + ', ' + myBool;
         if (myBool) {myOut.innerHTML += ', WOW';}
-      }
+      } 
+  </script>
+//Function for dice
+    <script>
+    let isRolling = false;
+    
+    function roll() {
+      if (isRolling) return;
+      isRolling = true;
+
+      let el = document.getElementById("dice");
+
+      let loop = setInterval(() => {
+        el.textContent = Math.floor(Math.random() * 6) + 1;
+      }, 50);
+
+      setTimeout(() => {
+        clearInterval(loop);
+        el.textContent = Math.floor(Math.random() * 6) + 1;
+        isRolling = false;
+      }, 500);
+    }
   </script>
 </head>
 <body>
     <p>This is <b>BOLD</b> text.</p>
     <button onclick="sayHello()">Click Me</button>
     <div id="myDiv01">...</div>
+
+<h3> Other Cool Things </h3>
+<h4> Automatic Dice Roll</h4>
+  <style>
+    body { font-family: sans-serif; text-align: center; }
+    .square-dice {
+      width: 80px; height: 80px; line-height: 80px;
+      background-color: red; color: white;
+      font-size: 2.5rem; font-weight: bold;
+      margin: 20px auto; border-radius: 8px;
+    }
+  </style>
+
+  <div id="dice" class="square-dice">1</div>
+  <button onclick="roll()">Roll</button>
 </body>
 </html>
