@@ -61,3 +61,49 @@
   <button onclick="roll()">Roll</button>
 </body>
 </html>
+<h4>Typewriter</h4>
+    <title>Typewriter</title>
+    <style>
+        #carriage { position: absolute; left: 10px; display: flex; }
+        #lever { width: 20px; height: 20px; background: gray; cursor: pointer; }
+        #paper { width: 300px; height: 200px; border: 1px solid black; white-space: pre-wrap; }
+    </style>
+<body>
+
+    <div id="carriage">
+        <div id="lever"></div>
+        <pre id="paper"></pre>
+    </div>
+
+    <script>
+        function initTypewriter() {
+            let text = "", dragging = false;
+            const paper = document.getElementById("paper"), carriage = document.getElementById("carriage");
+            const len = () => text.split('\n').pop().length;
+           
+            window.onkeydown = (e) => {
+                if (e.key.length !== 1 || len() >= 20) return;
+                paper.innerText = text += e.key;
+                carriage.style.left = `${10 + len() * 15}px`;
+                if (len() === 20) paper.style.color = "red";
+            };
+           
+            document.getElementById("lever").onmousedown = () => dragging = len() > 0;
+            window.onmouseup = () => dragging = false;
+
+            window.onmousemove = (e) => {
+                if (!dragging) return;
+                let nextLeft = carriage.offsetLeft + e.movementX;
+                carriage.style.left = `${nextLeft}px`;
+
+                if (nextLeft <= 10) {
+                    dragging = false;
+                    paper.innerText = text += "\n";
+                    paper.style.color = "black";
+                    carriage.style.left = "10px";
+                }
+            };
+        }
+
+        initTypewriter();
+    </script>
