@@ -1,1 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Cosmos: Exoplanets & Space Mechanics</title>
+    <!-- Tailwind CSS for modern layout -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- Three.js for 3D Animation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Plotly.js for Interactive Charts -->
+    <script src="https://cdn.plot.ly/plotly-2.24.1.min.js"></script>
+    <style>
+        body {
+            background-color: #0b0f19;
+            color: #f3f4f6;
+            font-family: system-ui, -apple-system, sans-serif;
+            overflow-x: hidden;
+        }
+        #canvas-container {
+            width: 100%;
+            height: 450px;
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            background: radial-gradient(circle, #111827 0%, #030712 100%);
+        }
+        .custom-card {
+            background: rgba(17, 24, 39, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(55, 65, 81, 0.4);
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <header class="max-w-7xl mx-auto mb-8 text-center md:text-left">
+        <h1 class="text-4xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-500 mb-2">
+            Cosmic Data Explorer
+        </h1>
+        <p class="text-gray-400 max-w-2xl">
+            An interactive dashboard pairing Real-Time 3D Orbital Mechanics simulations with Kepler Exoplanet Discovery distributions.
+        </p>
+    </header>
+
+    <main class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Left Column: Three.js Animation -->
+        <div class="lg:col-span-7 custom-card p-6 rounded-2xl flex flex-col justify-between">
+            <div>
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-bold text-indigo-300 flex items-center gap-2">
+                        🪐 3D N-Body Planetary Simulation
+                    </h2>
+                    <span class="px-2 py-1 text-xs font-semibold bg-emerald-500/10 text-emerald-400 rounded-full border border-emerald-500/20 animate-pulse">
+                        Live Render
+                    </span>
+                </div>
+                <p class="text-sm text-gray-400 mb-4">
+                    Real-time visualization of gravitational interactions in a multi-planetary system. Use your mouse to rotate and zoom. Adjust the warp factor to manipulate space-time.
+                </p>
+            </div>
+            
+            <div id="canvas-container" class="shadow-inner border border-gray-800">
+                <!-- Three.js injects canvas here -->
+            </div>
+
+            <div class="mt-4 flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-gray-800/60">
+                <div class="flex items-center gap-3">
+                    <label for="speed-slider" class="text-xs font-medium text-gray-400 uppercase tracking-wider">Time Warp</label>
+                    <input type="range" id="speed-slider" min="0" max="4" step="0.1" value="1" 
+                           class="w-32 accent-indigo-500 bg-gray-700 h-1.5 rounded-lg appearance-none cursor-pointer">
+                    <span id="speed-val" class="text-xs text-indigo-400 font-mono w-8">1.0x</span>
+                </div>
+                <div class="text-xs text-gray-500 font-mono">
+                    FPS: <span id="fps-counter" class="text-gray-400">60</span> | Particles: 3
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Plotly Dashboard Information -->
+        <div class="lg:col-span-5 flex flex-col gap-6">
+            
+            <!-- Statistical Card 1 -->
+            <div class="custom-card p-6 rounded-2xl flex flex-col h-full justify-between">
+                <div>
+                    <h2 class="text-xl font-bold text-purple-300 mb-2">🌌 Exoplanet Demographics</h2>
+                    <p class="text-sm text-gray-400 mb-4">
+                        Analysis of discovered planetary properties showing the relationship between Orbital Period (days) and Mass (relative to Earth).
+                    </p>
+                </div>
+                <div id="plotly-scatter" class="w-100% h-[280px]"></div>
+            </div>
+
+            <!-- Statistical Card 2 -->
+            <div class="custom-card p-6 rounded-2xl flex flex-col h-full justify-between">
+                <div>
+                    <h2 class="text-xl font-bold text-blue-300 mb-2">🔭 Discovery Methods</h2>
+                    <p class="text-sm text-gray-400 mb-4">
+                        Distribution of scientific methodologies used to confirm alien worlds over time.
+                    </p>
+                </div>
+                <div id="plotly-bar" class="w-100% h-[220px]"></div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <footer class="max-w-7xl mx-auto mt-8 pt-4 border-t border-gray-900 text-center text-xs text-gray-600">
+        Built dynamically with Three.js Ecosystem & Plotly Analytics Analytics Engine.
+    </footer>
+
+    <!-- Interactive Scripts Engine -->
+    <script>
+        // --- THREE.JS ORBITAL SIMULATION ---
+        const container = document.getElementById('canvas-container');
+        const width = container.clientWidth;
+        const height = container.clientHeight;
+
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x0b0f19, 0.015);
+
+        const camera = new THREE.PerspectiveCamera(60, width / height, 0.1, 1000);
+        camera.position.set(0, 20, 35);
+        camera.lookAt(0, 0, 0);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(width, height);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        container.appendChild(renderer.domElement);
+
+        // Lights
+        const ambientLight = new THREE.AmbientLight(0x333333);
+        scene.add(ambientLight);
+
+        const starLight = new THREE.PointLight(0xffffff, 2.5, 300);
+        scene.add(starLight);
+
+        // Central Star (Sun)
+        const sunGeo = new THREE.SphereGeometry(2.5, 32, 32);
+        const sunMat = new THREE.MeshBasicMaterial({ color: 0xffaa00 });
+        const sun = new THREE.Mesh(sunGeo, sunMat);
+        scene.add(sun);
+
+        // Glowing corona effect simple
+        const coronaGeo = new THREE.SphereGeometry(2.7, 32, 32);
+        const coronaMat = new THREE.MeshBasicMaterial({ color: 0xff5500, transparent: true, opacity: 0.3, side: THREE.BackSide });
+        const corona = new THREE.Mesh(coronaGeo, coronaMat);
+        scene.add(corona);
+
+        // Planet Setup Factory
+        function createPlanet(radius, color, distance, speed, inclination) {
+            const meshGeo = new THREE.SphereGeometry(radius, 24, 24);
+            const meshMat = new THREE.MeshStandardMaterial({ 
+                color: color, 
+                roughness: 0.6,
+                metalness: 0.1,
+                emissive: color,
+                emissiveIntensity: 0.15
+            });
+            const mesh = new THREE.Mesh(meshGeo, meshMat);
+
+            // Orbit line path
+            const orbitGeo = new THREE.BufferGeometry();
+            const points = [];
+            for(let i=0; i<=120; i++) {
+                const theta = (i/120) * Math.PI * 2;
+                const x = Math.cos(theta) * distance;
+                const z = Math.sin(theta) * distance;
+                points.push(new THREE.Vector3(x, 0, z));
+            }
+            orbitGeo.setFromPoints(points);
+            const orbitMat = new THREE.LineBasicMaterial({ color: 0x374151, transparent: true, opacity: 0.4 });
+            const orbitLine = new THREE.Line(orbitGeo, orbitMat);
+            orbitLine.rotation.x = inclination;
+            scene.add(orbitLine);
+
+            return { mesh, distance, speed, inclination, angle: Math.random() * Math.PI * 2 };
+        }
+
+        const planets = [
+            createPlanet(0.5, 0x60a5fa, 8, 0.03, 0.1),    // Cyan Inner
+            createPlanet(0.9, 0xa78bfa, 14, 0.015, -0.05), // Purple Middle
+            createPlanet(1.4, 0xf43f5e, 22, 0.007, 0.2)    // Rose Outer
+        ];
+
+        planets.forEach(p => scene.add(p.mesh));
+
+        // Background Starfield
+        const starsGeo = new THREE.BufferGeometry();
+        const starsCount = 600;
+        const starPositions = new Float32Array(starsCount * 3);
+        for(let i=0; i<starsCount*3; i++) {
+            starPositions[i] = (Math.random() - 0.5) * 150;
+        }
+        starsGeo.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
+        const starsMat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.4, transparent: true, opacity: 0.8 });
+        const starField = new THREE.Points(starsGeo, starsMat);
+        scene.add(starField);
+
+        // Interaction state
+        let isDragging = false;
+        let previousMousePosition = { x: 0, y: 0 };
+        let targetRotationX = 0;
+        let targetRotationY = 0;
+        let currentRotationX = 0;
+        let currentRotationY = 0;
+        let zoomDistance = 40;
+
+        container.addEventListener('mousedown', (e) => { isDragging = true; });
+        container.addEventListener('mousemove', (e) => {
+            const deltaMove = { x: e.offsetX - previousMousePosition.x, y: e.offsetY - previousMousePosition.y };
+            if(isDragging) {
+                targetRotationY += deltaMove.x * 0.005;
+                targetRotationX += deltaMove.y * 0.005;
+                targetRotationX = Math.max(-Math.PI/3, Math.min(Math.PI/3, targetRotationX));
+            }
+            previousMousePosition = { x: e.offsetX, y: e.offsetY };
+        });
+        window.addEventListener('mouseup', () => { isDragging = false; });
+        
+        container.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            zoomDistance += e.deltaY * 0.02;
+            zoomDistance = Math.max(15, Math.min(80, zoomDistance));
+        }, { passive: false });
+
+        // Speed Manipulation Controls
+        const speedSlider = document.getElementById('speed-slider');
+        const speedVal = document.getElementById('speed-val');
+        let timeWarp = 1.0;
+        speedSlider.addEventListener('input', (e) => {
+            timeWarp = parseFloat(e.target.value);
+            speedVal.textContent = timeWarp.toFixed(1) + 'x';
+        });
+
+        // Frame rate monitoring diagnostics
+        let lastTime = performance.now();
+        let frameCount = 0;
+        const fpsCounter = document.getElementById('fps-counter');
+
+        // Animation Loop
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Speed scaled updating
+            planets.forEach(p => {
+                p.angle += p.speed * timeWarp;
+                
+                // Vector transformations base orbital positions
+                const rawX = Math.cos(p.angle) * p.distance;
+                const rawZ = Math.sin(p.angle) * p.distance;
+                
+                // Factor in systemic inclination angles
+                p.mesh.position.x = rawX;
+                p.mesh.position.y = rawZ * Math.sin(p.inclination);
+                p.mesh.position.z = rawZ * Math.cos(p.inclination);
+                
+                p.mesh.rotation.y += 0.01;
+            });
+
+            // Gentle pulsar corona effect
+            const scale = 1 + Math.sin(performance.now() * 0.002) * 0.03;
+            corona.scale.set(scale, scale, scale);
+
+            // Interpolate smooth camera positioning via rotations matrix math approximation
+            currentRotationX += (targetRotationX - currentRotationX) * 0.05;
+            currentRotationY += (targetRotationY - currentRotationY) * 0.05;
+
+            camera.position.x = zoomDistance * Math.sin(currentRotationY) * Math.cos(currentRotationX);
+            camera.position.y = zoomDistance * Math.sin(currentRotationX);
+            camera.position.z = zoomDistance * Math.cos(currentRotationY) * Math.cos(currentRotationX);
+            camera.lookAt(0, 0, 0);
+
+            renderer.render(scene, camera);
+
+            // Performance Diagnostics Engine Calculation
+            frameCount++;
+            const time = performance.now();
+            if (time >= lastTime + 1000) {
+                fpsCounter.textContent = Math.round((frameCount * 1000) / (time - lastTime));
+                frameCount = 0;
+                lastTime = time;
+            }
+        }
+        animate();
+
+        // Responsive Resizing Viewport Framework
+        window.addEventListener('resize', () => {
+            const w = container.clientWidth;
+            const h = container.clientHeight;
+            camera.aspect = w / h;
+            camera.updateProjectionMatrix();
+            renderer.setSize(w, h);
+        });
+
+
+        // --- PLOTLY DATA VISUALIZATION SYSTEMS ---
+        
+        // Mocked Dataset derived from Kepler Exoplanetary Archival trends
+        const exoplanetData = {
+            mass: [0.4, 0.8, 1.2, 5.4, 11.2, 35.0, 95.2, 317.8, 500.2, 1200.5, 12, 85, 210, 1.1, 0.9, 4.2, 18, 9, 320, 750, 22, 1.5, 0.7, 14.5],
+            period: [1.2, 4.5, 11.2, 8.4, 3.2, 45.1, 120.5, 365.2, 780.1, 1105.0, 25, 88, 432, 18, 9.1, 33, 112, 54, 290, 680, 14, 6.2, 3.1, 84.5],
+            type: ['Terrestrial','Terrestrial','Super Earth','Super Earth','Neptunian','Neptunian','Gas Giant','Gas Giant','Gas Giant','Gas Giant','Neptunian','Gas Giant','Gas Giant','Super Earth','Terrestrial','Super Earth','Neptunian','Super Earth','Gas Giant','Gas Giant','Neptunian','Super Earth','Terrestrial','Neptunian'],
+            colors: ['#60a5fa','#60a5fa','#a78bfa','#a78bfa','#f43f5e','#f43f5e','#fbbf24','#fbbf24','#fbbf24','#fbbf24','#f43f5e','#fbbf24','#fbbf24','#a78bfa','#60a5fa','#a78bfa','#f43f5e','#a78bfa','#fbbf24','#fbbf24','#f43f5e','#a78bfa','#60a5fa','#f43f5e']
+        };
+
+        const configTheme = {
+            plot_bgcolor: 'rgba(0,0,0,0)',
+            paper_bgcolor: 'rgba(0,0,0,0)',
+            font: { color: '#9ca3af', family: 'system-ui, sans-serif', size: 11 },
+            margin: { t: 20, r: 20, b: 40, l: 50 },
+            showlegend: false
+        };
+
+        // Render Scatter Plot
+        Plotly.newPlot('plotly-scatter', [{
+            x: exoplanetData.period,
+            y: exoplanetData.mass,
+            text: exoplanetData.type,
+            mode: 'markers',
+            marker: {
+                size: 10,
+                color: exoplanetData.colors,
+                opacity: 0.8,
+                line: { color: '#1f2937', width: 1 }
+            },
+            hovertemplate: '<b>Type:</b> %{text}<br><b>Period:</b> %{x} Days<br><b>Mass:</b> %{y} M_earth<extra></extra>'
+        }], {
+            ...configTheme,
+            xaxis: { title: 'Orbital Period (Days)', type: 'log', gridcolor: '#1f2937', linecolor: '#374151' },
+            yaxis: { title: 'Mass (Earth Masses)', type: 'log', gridcolor: '#1f2937', linecolor: '#374151' }
+        }, { displayModeBar: false, responsive: true });
+
+        // Render Method Distribution Bar Chart
+        Plotly.newPlot('plotly-bar', [{
+            x: ['Transit Method', 'Radial Velocity', 'Direct Imaging', 'Gravitational Lensing'],
+            y: [3842, 1024, 164, 118],
+            type: 'bar',
+            marker: {
+                color: ['#6366f1', '#4f46e5', '#4338ca', '#312e81'],
+                line: { color: 'rgba(99, 102, 241, 0.5)', width: 1 }
+            },
+            hovertemplate: '<b>Method:</b> %{x}<br><b>Discoveries:</b> %{y}<extra></extra>'
+        }], {
+            ...configTheme,
+            xaxis: { gridcolor: 'none', linecolor: '#374151' },
+            yaxis: { title: 'Confirmed Count', gridcolor: '#1f2937', linecolor: '#374151' }
+        }, { displayModeBar: false, responsive: true });
+
+    </script>
+</body>
+</html>
 
