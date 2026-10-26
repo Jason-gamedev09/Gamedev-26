@@ -1,1 +1,203 @@
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vibrant Mandelbrot Explorer</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; overflow: hidden; }
+        body, html { width: 100%; height: 100%; background: #000; font-family: system-ui, sans-serif; }
+        canvas { display: block; width: 100vw; height: 100vh; cursor: crosshair; }
+        #myHintBox { position: absolute; top: 15px; left: 15px; background: rgba(20, 20, 20, 0.85); color: #0df; padding: 10px 15px; border: 1px solid #0df; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold; box-shadow: 0 0 10px rgba(0,238,255,0.3); transition: all 0.2s; user-select: none; z-index: 10; }
+        #myHintBox:hover { background: #0df; color: #000; box-shadow: 0 0 15px #0df; }
+        #myModal { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(15, 15, 25, 0.95); color: #fff; padding: 25px; border-radius: 12px; border: 2px solid #f0f; width: 90%; max-width: 450px; box-shadow: 0 0 25px rgba(255,0,255,0.4); z-index: 20; text-align: center; line-height: 1.5; }
+        #myModal h2 { color: #f0f; margin-bottom: 15px; font-size: 22px; }
+        #myModal code { display: block; background: rgba(255,255,255,0.1); padding: 10px; margin: 15px 0; border-radius: 6px; font-size: 18px; color: #0df; font-family: monospace; }
+        #myModal button { background: #f0f; color: #fff; border: none; padding: 8px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 15px; transition: opacity 0.2s; }
+        #myModal button:hover { opacity: 0.9; }
+    </style>
+</head>
+<body>
 
+    <div id="myHintBox">? How it works</div>
+
+    <div id="myModal">
+        <h2>The Mandelbrot Fractal</h2>
+        <p>This mesmerizing geometry is generated in the complex number plane using a deceptively simple iterative formula:</p>
+        <code>Z<sub>n+1</sub> = Z<sub>n</sub><sup>2</sup> + C</code>
+        <p>For every pixel, we set <b>Z<sub>0</sub> = 0</b> and map the screen coordinate to the constant complex number <b>C</b>. We repeat the equation up to 300 times.</p>
+        <p>If the value spirals off to infinity, the speed at which it escapes determines its vibrant color cycling. If it stays bounded forever, it belongs to the black heart of the fractal set.</p>
+        <button id="myCloseBtn">Explore</button>
+    </div>
+
+    <canvas id="myCanvas"></canvas>
+
+    <script>
+        const myCanvas = document.getElementById('myCanvas');
+        const myCtx = myCanvas.getContext('2d');
+        const myHintBox = document.getElementById('myHintBox');
+        const myModal = document.getElementById('myModal');
+        const myCloseBtn = document.getElementById('myCloseBtn');
+
+        // Create an offscreen canvas to cache the rendered fractal background
+        const myOffscreenCanvas = document.createElement('canvas');
+        const myOffscreenCtx = myOffscreenCanvas.getContext('2d');
+
+        // Fractal View State
+        let myCenterX = -0.7;
+        let myCenterY = 0;
+        let myZoomWidth = 3.0; 
+        let myMaxIterations = 300;
+
+        // Interactive Box Selection State
+        let myMouseX = 0;
+        let myMouseY = 0;
+        let myBoxScale = 0.3; 
+        let myRenderGeneration = 0; // Token to cancel old render threads on fast clicks
+
+        // Sync sizes of both canvases
+        const myResizeCanvases = () => {
+            if (myCanvas.width !== window.innerWidth || myCanvas.height !== window.innerHeight) {
+                myCanvas.width = window.innerWidth;
+                myCanvas.height = window.innerHeight;
+                myOffscreenCanvas.width = myCanvas.width;
+                myOffscreenCanvas.height = myCanvas.height;
+            }
+        };
+
+        // Redraws the cached fractal background and layers the preview box on top instantly
+        const myRenderScenePipeline = () => {
+            myCtx.clearRect(0, 0, myCanvas.width, myCanvas.height);
+            myCtx.drawImage(myOffscreenCanvas, 0, 0);
+            
+            // Calculate and draw the dashed preview rectangle
+            const myBoxW = myCanvas.width * myBoxScale;
+            const myBoxH = myCanvas.height * myBoxScale;
+
+            myCtx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+            myCtx.lineWidth = 1.5;
+            myCtx.setLineDash([6, 4]);
+            myCtx.strokeRect(myMouseX - myBoxW / 2, myMouseY - myBoxH / 2, myBoxW, myBoxH);
+            myCtx.setLineDash([]);
+        };
+
+        // Asynchronous mathematical generator that writes into the offscreen cache
+        const myRenderFractalAsync = async () => {
+            myResizeCanvases();
+            const myCurrentGen = ++myRenderGeneration;
+            const myWidth = myCanvas.width;
+            const myHeight = myCanvas.height;
+            
+            const myImgData = myOffscreenCtx.createImageData(myWidth, myHeight);
+            const myData = myImgData.data;
+
+            const myRatio = myWidth / myHeight;
+            let myZoomHeight = myZoomWidth / myRatio;
+
+            const myMinX = myCenterX - myZoomWidth / 2;
+            const myMinY = myCenterY - myZoomHeight / 2;
+
+            for (let y = 0; y < myHeight; y++) {
+                // Periodically yield thread control to keep UI hyper-responsive
+                if (y % 25 === 0) {
+                    if (myCurrentGen !== myRenderGeneration) return; // Drop calculations if view changed
+                    myOffscreenCtx.putImageData(myImgData, 0, 0);
+                    myRenderScenePipeline();
+                    await new Promise(resolve => setTimeout(resolve, 0));
+                }
+
+                const cY = myMinY + (y / myHeight) * myZoomHeight;
+
+                for (let x = 0; x < myWidth; x++) {
+                    const cX = myMinX + (x / myWidth) * myZoomWidth;
+
+                    let zX = 0.0;
+                    let zY = 0.0;
+                    let i = 0;
+
+                    while (zX * zX + zY * zY <= 4.0 && i < myMaxIterations) {
+                        const myTempX = zX * zX - zY * zY + cX;
+                        zY = 2.0 * zX * zY + cY;
+                        zX = myTempX;
+                        i++;
+                    }
+
+                    const myPixelIndex = (y * myWidth + x) * 4;
+
+                    if (i < myMaxIterations) {
+                        // Continuous smooth shading formulas
+                        const myLogZ = Math.log(zX * zX + zY * zY) / 2;
+                        const myNu = Math.log(myLogZ / Math.log(2)) / Math.log(2);
+                        const mySmoothIter = i + 1 - myNu;
+
+                        const r = Math.sin(0.015 * mySmoothIter + 0.0) * 127 + 128;
+                        const g = Math.sin(0.022 * mySmoothIter + 1.5) * 127 + 128;
+                        const b = Math.sin(0.035 * mySmoothIter + 3.0) * 127 + 128;
+
+                        myData[myPixelIndex] = r;
+                        myData[myPixelIndex + 1] = g;
+                        myData[myPixelIndex + 2] = b;
+                        myData[myPixelIndex + 3] = 255;
+                    } else {
+                        myData[myPixelIndex] = 0;
+                        myData[myPixelIndex + 1] = 0;
+                        myData[myPixelIndex + 2] = 0;
+                        myData[myPixelIndex + 3] = 255;
+                    }
+                }
+            }
+
+            if (myCurrentGen === myRenderGeneration) {
+                myOffscreenCtx.putImageData(myImgData, 0, 0);
+                myRenderScenePipeline();
+            }
+        };
+
+        // Tracks pointer movement smoothly without recalculating core math
+        myCanvas.onmousemove = (e) => {
+            myMouseX = e.clientX;
+            myMouseY = e.clientY;
+            myRenderScenePipeline();
+        };
+
+        // Scroll wheel updates selection bounding dimensions instantly
+        myCanvas.onwheel = (e) => {
+            e.preventDefault();
+            if (e.deltaY < 0) {
+                myBoxScale = Math.max(0.05, myBoxScale - 0.02);
+            } else {
+                myBoxScale = Math.min(0.95, myBoxScale + 0.02);
+            }
+            myRenderScenePipeline();
+        };
+
+        // Shifts coordinate space anchors and initiates a fresh deep-render background layer
+        myCanvas.onclick = () => {
+            const myRatio = myCanvas.width / myCanvas.height;
+            const myZoomHeight = myZoomWidth / myRatio;
+
+            const myMinX = myCenterX - myZoomWidth / 2;
+            const myMinY = myCenterY - myZoomHeight / 2;
+
+            myCenterX = myMinX + (myMouseX / myCanvas.width) * myZoomWidth;
+            myCenterY = myMinY + (myMouseY / myCanvas.height) * myZoomHeight;
+
+            myZoomWidth = myZoomWidth * myBoxScale;
+            myMaxIterations = Math.floor(myMaxIterations + 40); // Scaling fidelity precision detail
+
+            myRenderFractalAsync();
+        };
+
+        // User Interface layout toggles
+        myHintBox.onclick = () => { myModal.style.display = 'block'; };
+        myCloseBtn.onclick = () => { myModal.style.display = 'none'; };
+        
+        window.onresize = () => { 
+            myResizeCanvases();
+            myRenderFractalAsync(); 
+        };
+
+        // Run engine setup on initialization
+        myResizeCanvases();
+        myRenderFractalAsync();
+    </script>
+</body>
+</html>
