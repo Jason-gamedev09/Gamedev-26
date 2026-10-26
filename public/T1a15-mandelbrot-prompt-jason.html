@@ -1,3 +1,5 @@
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -5,7 +7,7 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; overflow: hidden; }
         body, html { width: 100%; height: 100%; background: #000; font-family: system-ui, sans-serif; }
-        canvas { display: block; width: 100vw; height: 100vh; cursor: crosshair; }
+        canvas { display: block; width: 100vw; height: 100vh; position: absolute; top: 0; left: 0; }
         #myHintBox { position: absolute; top: 15px; left: 15px; background: rgba(20, 20, 20, 0.85); color: #0df; padding: 10px 15px; border: 1px solid #0df; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold; box-shadow: 0 0 10px rgba(0,238,255,0.3); transition: all 0.2s; user-select: none; z-index: 10; }
         #myHintBox:hover { background: #0df; color: #000; box-shadow: 0 0 15px #0df; }
         #myModal { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(15, 15, 25, 0.95); color: #fff; padding: 25px; border-radius: 12px; border: 2px solid #f0f; width: 90%; max-width: 450px; box-shadow: 0 0 25px rgba(255,0,255,0.4); z-index: 20; text-align: center; line-height: 1.5; }
@@ -17,187 +19,225 @@
 </head>
 <body>
 
+    <!-- WebGL Canvas for the Fractal -->
+    <canvas id="myGlCanvas"></canvas>
+    <!-- 2D Overlay Canvas for the Overlay Selection Rectangle -->
+    <canvas id="myOverlayCanvas"></canvas>
+    
     <div id="myHintBox">? How it works</div>
 
     <div id="myModal">
         <h2>The Mandelbrot Fractal</h2>
         <p>This mesmerizing geometry is generated in the complex number plane using a deceptively simple iterative formula:</p>
         <code>Z<sub>n+1</sub> = Z<sub>n</sub><sup>2</sup> + C</code>
-        <p>For every pixel, we set <b>Z<sub>0</sub> = 0</b> and map the screen coordinate to the constant complex number <b>C</b>. We repeat the equation up to 300 times.</p>
-        <p>If the value spirals off to infinity, the speed at which it escapes determines its vibrant color cycling. If it stays bounded forever, it belongs to the black heart of the fractal set.</p>
-        <button id="myCloseBtn">Explore</button>
+        <p><strong>Controls:</strong> Move mouse to place preview box. Scroll wheel to resize preview area. Left click to zoom in. Right click to zoom out.</p>
+        <button id="myCloseButton">Explore</button>
     </div>
 
-    <canvas id="myCanvas"></canvas>
-
     <script>
-        const myCanvas = document.getElementById('myCanvas');
-        const myCtx = myCanvas.getContext('2d');
-        const myHintBox = document.getElementById('myHintBox');
-        const myModal = document.getElementById('myModal');
-        const myCloseBtn = document.getElementById('myCloseBtn');
+        // DOM Elements
+        const myHintElement = document.getElementById('myHintBox');
+        const myModalElement = document.getElementById('myModal');
+        const myCloseElement = document.getElementById('myCloseButton');
+        const myGlCanvas = document.getElementById('myGlCanvas');
+        const myOverlayCanvas = document.getElementById('myOverlayCanvas');
+        
+        // Modal UI Controls
+        myHintElement.onclick = () => myModalElement.style.display = 'block';
+        myCloseElement.onclick = () => myModalElement.style.display = 'none';
 
-        // Create an offscreen canvas to cache the rendered fractal background
-        const myOffscreenCanvas = document.createElement('canvas');
-        const myOffscreenCtx = myOffscreenCanvas.getContext('2d');
+        // WebGL Context Initialisation
+        const gl = myGlCanvas.getContext('webgl');
+        const myCtx = myOverlayCanvas.getContext('2d');
 
-        // Fractal View State
-        let myCenterX = -0.7;
-        let myCenterY = 0;
-        let myZoomWidth = 3.0; 
-        let myMaxIterations = 300;
+        if (!gl) {
+            alert('WebGL not supported in your browser.');
+        }
 
-        // Interactive Box Selection State
-        let myMouseX = 0;
-        let myMouseY = 0;
-        let myBoxScale = 0.3; 
-        let myRenderGeneration = 0; // Token to cancel old render threads on fast clicks
-
-        // Sync sizes of both canvases
-        const myResizeCanvases = () => {
-            if (myCanvas.width !== window.innerWidth || myCanvas.height !== window.innerHeight) {
-                myCanvas.width = window.innerWidth;
-                myCanvas.height = window.innerHeight;
-                myOffscreenCanvas.width = myCanvas.width;
-                myOffscreenCanvas.height = myCanvas.height;
+        // Shaders
+        const myVsSource = `
+            attribute vec2 myPosition;
+            void main() {
+                gl_Position = vec4(myPosition, 0.0, 1.0);
             }
-        };
+        `;
 
-        // Redraws the cached fractal background and layers the preview box on top instantly
-        const myRenderScenePipeline = () => {
-            myCtx.clearRect(0, 0, myCanvas.width, myCanvas.height);
-            myCtx.drawImage(myOffscreenCanvas, 0, 0);
-            
-            // Calculate and draw the dashed preview rectangle
-            const myBoxW = myCanvas.width * myBoxScale;
-            const myBoxH = myCanvas.height * myBoxScale;
+        const myFsSource = `
+            precision highp float;
+            uniform vec2 u_myResolution;
+            uniform vec2 u_myZoomCenter;
+            uniform float u_myZoomSize;
+            uniform float u_myTime;
 
-            myCtx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
-            myCtx.lineWidth = 1.5;
-            myCtx.setLineDash([6, 4]);
-            myCtx.strokeRect(myMouseX - myBoxW / 2, myMouseY - myBoxH / 2, myBoxW, myBoxH);
-            myCtx.setLineDash([]);
-        };
+            void main() {
+                vec2 c = u_myZoomCenter + (gl_FragCoord.xy - u_myResolution / 2.0) * (u_myZoomSize / u_myResolution.y);
+                vec2 z = vec2(0.0);
+                float n = 0.0;
+                const float myMaxIterations = 500.0;
 
-        // Asynchronous mathematical generator that writes into the offscreen cache
-        const myRenderFractalAsync = async () => {
-            myResizeCanvases();
-            const myCurrentGen = ++myRenderGeneration;
-            const myWidth = myCanvas.width;
-            const myHeight = myCanvas.height;
-            
-            const myImgData = myOffscreenCtx.createImageData(myWidth, myHeight);
-            const myData = myImgData.data;
-
-            const myRatio = myWidth / myHeight;
-            let myZoomHeight = myZoomWidth / myRatio;
-
-            const myMinX = myCenterX - myZoomWidth / 2;
-            const myMinY = myCenterY - myZoomHeight / 2;
-
-            for (let y = 0; y < myHeight; y++) {
-                // Periodically yield thread control to keep UI hyper-responsive
-                if (y % 25 === 0) {
-                    if (myCurrentGen !== myRenderGeneration) return; // Drop calculations if view changed
-                    myOffscreenCtx.putImageData(myImgData, 0, 0);
-                    myRenderScenePipeline();
-                    await new Promise(resolve => setTimeout(resolve, 0));
+                for (float i = 0.0; i < myMaxIterations; i++) {
+                    if (z.x * z.x + z.y * z.y > 4.0) {
+                        n = i;
+                        break;
+                    }
+                    z = vec2(z.x * z.x - z.y * z.y + c.x, 2.0 * z.x * z.y + c.y);
                 }
 
-                const cY = myMinY + (y / myHeight) * myZoomHeight;
-
-                for (let x = 0; x < myWidth; x++) {
-                    const cX = myMinX + (x / myWidth) * myZoomWidth;
-
-                    let zX = 0.0;
-                    let zY = 0.0;
-                    let i = 0;
-
-                    while (zX * zX + zY * zY <= 4.0 && i < myMaxIterations) {
-                        const myTempX = zX * zX - zY * zY + cX;
-                        zY = 2.0 * zX * zY + cY;
-                        zX = myTempX;
-                        i++;
-                    }
-
-                    const myPixelIndex = (y * myWidth + x) * 4;
-
-                    if (i < myMaxIterations) {
-                        // Continuous smooth shading formulas
-                        const myLogZ = Math.log(zX * zX + zY * zY) / 2;
-                        const myNu = Math.log(myLogZ / Math.log(2)) / Math.log(2);
-                        const mySmoothIter = i + 1 - myNu;
-
-                        const r = Math.sin(0.015 * mySmoothIter + 0.0) * 127 + 128;
-                        const g = Math.sin(0.022 * mySmoothIter + 1.5) * 127 + 128;
-                        const b = Math.sin(0.035 * mySmoothIter + 3.0) * 127 + 128;
-
-                        myData[myPixelIndex] = r;
-                        myData[myPixelIndex + 1] = g;
-                        myData[myPixelIndex + 2] = b;
-                        myData[myPixelIndex + 3] = 255;
-                    } else {
-                        myData[myPixelIndex] = 0;
-                        myData[myPixelIndex + 1] = 0;
-                        myData[myPixelIndex + 2] = 0;
-                        myData[myPixelIndex + 3] = 255;
-                    }
+                if (n == 0.0 || n == myMaxIterations) {
+                    gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+                } else {
+                    // Continuous smooth color logic incorporating dynamic time cycling
+                    float myT = n / myMaxIterations;
+                    float myCycle = u_myTime * 0.02;
+                    float r = 0.5 + 0.5 * cos(6.28318 * (1.0 * myT + 0.0 + myCycle));
+                    float g = 0.5 + 0.5 * cos(6.28318 * (1.0 * myT + 0.33 + myCycle));
+                    float b = 0.5 + 0.5 * cos(6.28318 * (1.0 * myT + 0.67 + myCycle));
+                    gl_FragColor = vec4(r, g, b, 1.0);
                 }
             }
+        `;
 
-            if (myCurrentGen === myRenderGeneration) {
-                myOffscreenCtx.putImageData(myImgData, 0, 0);
-                myRenderScenePipeline();
+        // Async Shader Pipeline Setup
+        async function myCreateShaderAsync(gl, myType, mySource) {
+            const myShader = gl.createShader(myType);
+            gl.shaderSource(myShader, mySource);
+            gl.compileShader(myShader);
+            return myShader;
+        }
+
+        async function myInitPipelineAsync() {
+            const myVertexShader = await myCreateShaderAsync(gl, gl.VERTEX_SHADER, myVsSource);
+            const myFragmentShader = await myCreateShaderAsync(gl, gl.FRAGMENT_SHADER, myFsSource);
+            const myProgram = gl.createProgram();
+            gl.attachShader(program = myProgram, myVertexShader);
+            gl.attachShader(program = myProgram, myFragmentShader);
+            gl.linkProgram(myProgram);
+            gl.useProgram(myProgram);
+            return myProgram;
+        }
+
+        let myProgram;
+        let myResolutionLocation, myZoomCenterLocation, myZoomSizeLocation, myTimeLocation;
+
+        // View Parameters
+        let myZoomCenterX = -0.5;
+        let myZoomCenterY = 0.0;
+        let myZoomSize = 3.0;
+
+        // Interactive Preview Box Metrics
+        let myPreviewScale = 0.3; // Default preview box is 30% of window size
+        let myCurrentMouseX = window.innerWidth / 2;
+        let myCurrentMouseY = window.innerHeight / 2;
+        let myStartTime = performance.now();
+
+        // High performance window dimension handler
+        function myResizeViewports() {
+            const myW = window.innerWidth;
+            const myH = window.innerHeight;
+            
+            if (myGlCanvas.width !== myW || myGlCanvas.height !== myH) {
+                myGlCanvas.width = myW;
+                myGlCanvas.height = myH;
+                gl.viewport(0, 0, myW, myH);
             }
+            if (myOverlayCanvas.width !== myW || myOverlayCanvas.height !== myH) {
+                myOverlayCanvas.width = myW;
+                myOverlayCanvas.height = myH;
+            }
+        }
+
+        // Render loop function
+        function myRenderFrame() {
+            myResizeViewports();
+
+            // Clear Overlay Context
+            myCtx.clearRect(0, 0, myOverlayCanvas.width, myOverlayCanvas.height);
+
+            // Compute uniform updates
+            const myCurrentTime = (performance.now() - myStartTime) / 1000.0;
+            gl.uniform2f(myResolutionLocation, myGlCanvas.width, myGlCanvas.height);
+            gl.uniform2f(myZoomCenterLocation, myZoomCenterX, myZoomCenterY);
+            gl.uniform1f(myZoomSizeLocation, myZoomSize);
+            gl.uniform1f(myTimeLocation, myCurrentTime);
+
+            // Draw Fractal Triangles
+            gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+            // Calculate and draw dashed overlay rectangle matching exact aspect ratios
+            const myRectWidth = myOverlayCanvas.width * myPreviewScale;
+            const myRectHeight = myOverlayCanvas.height * myPreviewScale;
+            const myRectX = myCurrentMouseX - myRectWidth / 2;
+            const myRectY = myCurrentMouseY - myRectHeight / 2;
+
+            myCtx.strokeStyle = '#0df';
+            myCtx.lineWidth = 2;
+            myCtx.setLineDash([6, 4]); // Clean structural dashes fix
+            myCtx.shadowColor = '#000';
+            myCtx.shadowBlur = 4;
+            myCtx.strokeRect(myRectX, myRectY, myRectWidth, myRectHeight);
+
+            requestAnimationFrame(myRenderFrame);
+        }
+
+        // Mouse Interactivity Event Handling
+        myOverlayCanvas.onmousemove = (e) => {
+            myCurrentMouseX = e.clientX;
+            myCurrentMouseY = e.clientY;
         };
 
-        // Tracks pointer movement smoothly without recalculating core math
-        myCanvas.onmousemove = (e) => {
-            myMouseX = e.clientX;
-            myMouseY = e.clientY;
-            myRenderScenePipeline();
-        };
-
-        // Scroll wheel updates selection bounding dimensions instantly
-        myCanvas.onwheel = (e) => {
+        myOverlayCanvas.onwheel = (e) => {
             e.preventDefault();
             if (e.deltaY < 0) {
-                myBoxScale = Math.max(0.05, myBoxScale - 0.02);
+                myPreviewScale = Math.max(0.05, myPreviewScale * 0.9); // Shrink preview area (Zoom focus)
             } else {
-                myBoxScale = Math.min(0.95, myBoxScale + 0.02);
+                myPreviewScale = Math.min(0.95, myPreviewScale * 1.1); // Grow preview area (Wide view)
             }
-            myRenderScenePipeline();
         };
 
-        // Shifts coordinate space anchors and initiates a fresh deep-render background layer
-        myCanvas.onclick = () => {
-            const myRatio = myCanvas.width / myCanvas.height;
-            const myZoomHeight = myZoomWidth / myRatio;
+        myOverlayCanvas.onclick = (e) => {
+            // Click to transform screen coordinate space directly into complex mapping planes
+            const myFactor = myZoomSize / myGlCanvas.height;
+            const myClickedComplexX = myZoomCenterX + (e.clientX - myGlCanvas.width / 2) * myFactor;
+            const myClickedComplexY = myZoomCenterY - (e.clientY - myGlCanvas.height / 2) * myFactor;
 
-            const myMinX = myCenterX - myZoomWidth / 2;
-            const myMinY = myCenterY - myZoomHeight / 2;
-
-            myCenterX = myMinX + (myMouseX / myCanvas.width) * myZoomWidth;
-            myCenterY = myMinY + (myMouseY / myCanvas.height) * myZoomHeight;
-
-            myZoomWidth = myZoomWidth * myBoxScale;
-            myMaxIterations = Math.floor(myMaxIterations + 40); // Scaling fidelity precision detail
-
-            myRenderFractalAsync();
+            // Recenter viewport position and scale boundary size to match preview dimensions
+            myZoomCenterX = myClickedComplexX;
+            myZoomCenterY = myClickedComplexY;
+            myZoomSize = myZoomSize * myPreviewScale;
         };
 
-        // User Interface layout toggles
-        myHintBox.onclick = () => { myModal.style.display = 'block'; };
-        myCloseBtn.onclick = () => { myModal.style.display = 'none'; };
-        
-        window.onresize = () => { 
-            myResizeCanvases();
-            myRenderFractalAsync(); 
-        };
-
-        // Run engine setup on initialization
-        myResizeCanvases();
-        myRenderFractalAsync();
-    </script>
-</body>
-</html>
+        // Right click handler to zoom out smoothly centered on click position
+        myOverlayCanvas.oncontextmenu = (e) => {
+            e.preventDefault();
+            const myFactor = myZoomSize / myGlCanvas.height;
+            const myClickedComplexX = myZoomCenterX + (e.clientX - myGlCanvas.width / 2) * myFactor;
+		const myClickedComplexY = myZoomCenterY - (e.clientY - myGlCanvas.height / 2) * myFactor;
+// Invert the layout calculation scaling rules to shift boundaries outward
+myZoomCenterX = myClickedComplexX;
+myZoomCenterY = myClickedComplexY;
+myZoomSize = myZoomSize / myPreviewScale;
+};
+window.onresize = myResizeViewports;
+// Asynchronous Core Bootstrap
+(async function myBootstrapAsync() {
+myProgram = await myInitPipelineAsync();
+// Setup Fullscreen Quad Geometry
+const myBuffer = gl.createBuffer();
+gl.bindBuffer(gl.ARRAY_BUFFER, myBuffer);
+gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+-1, -1,   1, -1,  -1,  1,
+-1,  1,   1, -1,   1,  1,
+]), gl.STATIC_DRAW);
+const myPositionLocation = gl.getAttribLocation(myProgram, "myPosition");
+gl.enableVertexAttribArray(myPositionLocation);
+gl.vertexAttribPointer(myPositionLocation, 2, gl.FLOAT, false, 0, 0);
+// Extract Uniform Map Pointers
+myResolutionLocation = gl.getUniformLocation(myProgram, "u_myResolution");
+myZoomCenterLocation = gl.getUniformLocation(myProgram, "u_myZoomCenter");
+myZoomSizeLocation = gl.getUniformLocation(myProgram, "u_myZoomSize");
+myTimeLocation = gl.getUniformLocation(myProgram, "u_myTime");
+// Kick off main presentation loops
+myResizeViewports();
+myRenderFrame();
+})();
+</script>
