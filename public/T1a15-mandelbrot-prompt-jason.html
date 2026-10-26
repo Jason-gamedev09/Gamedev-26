@@ -1,222 +1,126 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vibrant Mandelbrot Explorer</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; overflow: hidden; }
-        body, html { width: 100%; height: 100%; background: #000; font-family: system-ui, sans-serif; }
-        canvas { display: block; width: 100vw; height: 100vh; position: absolute; top: 0; left: 0; }
-        #myHintBox { position: absolute; top: 15px; left: 15px; background: rgba(20, 20, 20, 0.85); color: #0df; padding: 10px 15px; border: 1px solid #0df; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold; box-shadow: 0 0 10px rgba(0,238,255,0.3); transition: all 0.2s; user-select: none; z-index: 10; }
-        #myHintBox:hover { background: #0df; color: #000; box-shadow: 0 0 15px #0df; }
-        #myModal { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(15, 15, 25, 0.95); color: #fff; padding: 25px; border-radius: 12px; border: 2px solid #f0f; width: 90%; max-width: 450px; box-shadow: 0 0 25px rgba(255,0,255,0.4); z-index: 20; text-align: center; line-height: 1.5; }
-        #myModal h2 { color: #f0f; margin-bottom: 15px; font-size: 22px; }
-        #myModal code { display: block; background: rgba(255,255,255,0.1); padding: 10px; margin: 15px 0; border-radius: 6px; font-size: 18px; color: #0df; font-family: monospace; }
-        #myModal button { background: #f0f; color: #fff; border: none; padding: 8px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 15px; transition: opacity 0.2s; }
-        #myModal button:hover { opacity: 0.9; }
-    </style>
-</head>
-<body>
+const myW = myBufferCanvas.width;
+            const myH = myBufferCanvas.height;
+            const myImgData = myBufferCtx.createImageData(myW, myH);
+            const myData = myImgData.data;
 
-    <canvas id="myGlCanvas"></canvas>
-    <canvas id="myOverlayCanvas" style="pointer-events: none;"></canvas>
-    
-    <div id="myHintBox">? How it works</div>
+            const myZoomHeight = (myZoomWidth * myH) / myW;
+            const myMinReal = myCenterX - myZoomWidth / 2;
+            const myMinImag = myCenterY - myZoomHeight / 2;
 
-    <div id="myModal">
-        <h2>The Mandelbrot Fractal</h2>
-        <p>This mesmerizing geometry is generated in the complex number plane using a deceptively simple iterative formula:</p>
-        <code>Z<sub>n+1</sub> = Z<sub>n</sub><sup>2</sup> + C</code>
-        <p><strong>Controls:</strong> Move mouse to place preview box. Scroll wheel to resize preview area. Left click to zoom in.</p>
-        <button id="myCloseButton">Explore</button>
-    </div>
+            const myRealScale = myZoomWidth / myW;
+            const myImagScale = myZoomHeight / myH;
+            const myChunkHeight = 48; 
 
-    <script>
-        const myHintElement = document.getElementById('myHintBox');
-        const myModalElement = document.getElementById('myModal');
-        const myCloseElement = document.getElementById('myCloseButton');
-        const myGlCanvas = document.getElementById('myGlCanvas');
-        const myOverlayCanvas = document.getElementById('myOverlayCanvas');
-        
-        myHintElement.onclick = () => myModalElement.style.display = 'block';
-        myCloseElement.onclick = () => myModalElement.style.display = 'none';
+            for (let myY = 0; myY < myH; myY++) {
+                if (myY % myChunkHeight === 0) {
+                    await new Promise(myResolve => setTimeout(myResolve, 0));
+                }
 
-        const myGlContext = myGlCanvas.getContext('webgl');
-        const myCtx = myOverlayCanvas.getContext('2d');
+                const myCImag = myMinImag + myY * myImagScale;
 
-        if (!myGlContext) {
-            alert('WebGL not supported in your browser.');
-        }
+                for (let myX = 0; myX < myW; myX++) {
+                    const myCReal = myMinReal + myX * myRealScale;
 
-        const myVsSource = `
-            attribute vec2 myPosition;
-            void main() {
-                gl_Position = vec4(myPosition, 0.0, 1.0);
-            }
-        `;
+                    let myZReal = 0.0;
+                    let myZImag = 0.0;
+                    let myIteration = 0;
 
-        const myFsSource = `
-            precision highp float;
-            uniform vec2 u_myResolution;
-            uniform vec2 u_myZoomCenter;
-            uniform float u_myZoomSize;
-            uniform float u_myTime;
-
-            void main() {
-                vec2 myC = u_myZoomCenter + (gl_FragCoord.xy - u_myResolution / 2.0) * (u_myZoomSize / u_myResolution.y);
-                vec2 myZ = vec2(0.0);
-                float myN = 0.0;
-                const float myMaxIterations = 500.0;
-
-                for (float myI = 0.0; myI < myMaxIterations; myI++) {
-                    if (myZ.x * myZ.x + myZ.y * myZ.y > 16.0) {
-                        myN = myI;
-                        break;
+                    // Compute escape dynamics optimization
+                    while (myZReal * myZReal + myZImag * myZImag <= 4.0 && myIteration < myMaxIterations) {
+                        const myNextReal = myZReal * myZReal - myZImag * myZImag + myCReal;
+                        myZImag = 2.0 * myZReal * myZImag + myCImag;
+                        myZReal = myNextReal;
+                        myIteration++;
                     }
-                    myZ = vec2(myZ.x * myZ.x - myZ.y * myZ.y + myC.x, 2.0 * myZ.x * myZ.y + myC.y);
+
+                    const myPixelIndex = (myY * myW + myX) * 4;
+
+                    if (myIteration < myMaxIterations) {
+                        // Continuous smooth coloring equations
+                        const myLogZ = Math.log(myZReal * myZReal + myZImag * myZImag) / 2;
+                        const myNu = Math.log(myLogZ / Math.log(2)) / Math.log(2);
+                        const mySmoothValue = myIteration + 1 - myNu;
+
+                        // Vibrant color palettes
+                        myData[myPixelIndex]     = Math.sin(0.015 * mySmoothValue + 1.0) * 127 + 128;
+                        myData[myPixelIndex + 1] = Math.sin(0.022 * mySmoothValue + 2.5) * 127 + 128;
+                        myData[myPixelIndex + 2] = Math.sin(0.035 * mySmoothValue + 4.0) * 127 + 128;
+                        myData[myPixelIndex + 3] = 255;
+                    } else {
+                        myData[myPixelIndex]     = 0;
+                        myData[myPixelIndex + 1] = 0;
+                        myData[myPixelIndex + 2] = 0;
+                        myData[myPixelIndex + 3] = 255;
+                    }
                 }
-
-                if (myN == 0.0 || myN == myMaxIterations) {
-                    gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
-                } else {
-                    float myLogZ = log(myZ.x * myZ.x + myZ.y * myZ.y) / 2.0;
-                    float myNu = log(myLogZ / log(2.0)) / log(2.0);
-                    float mySmoothValue = myN + 1.0 - myNu;
-
-                    float myT = mySmoothValue / myMaxIterations;
-                    float myCycle = u_myTime * 0.05;
-                    float myR = 0.5 + 0.5 * cos(6.28318 * (15.0 * myT + 0.0 + myCycle));
-                    float myG = 0.5 + 0.5 * cos(6.28318 * (15.0 * myT + 0.33 + myCycle));
-                    float myB = 0.5 + 0.5 * cos(6.28318 * (15.0 * myT + 0.67 + myCycle));
-                    gl_FragColor = vec4(myR, myG, myB, 1.0);
-                }
             }
-        `;
 
-        async function myCreateShaderAsync(myTargetGl, myType, mySource) {
-            const myShader = myTargetGl.createShader(myType);
-            myTargetGl.shaderSource(myShader, mySource);
-            myTargetGl.compileShader(myShader);
-            return myShader;
-        }
-
-        async function myInitPipelineAsync() {
-            const myVertexShader = await myCreateShaderAsync(myGlContext, myGlContext.VERTEX_SHADER, myVsSource);
-            const myFragmentShader = await myCreateShaderAsync(myGlContext, myGlContext.FRAGMENT_SHADER, myFsSource);
-            const myProgramInstance = myGlContext.createProgram();
-            myGlContext.attachShader(myProgramInstance, myVertexShader);
-            myGlContext.attachShader(myProgramInstance, myFragmentShader);
-            myGlContext.linkProgram(myProgramInstance);
-            myGlContext.useProgram(myProgramInstance);
-            return myProgramInstance;
-        }
-
-        let myProgram;
-        let myResolutionLocation, myZoomCenterLocation, myZoomSizeLocation, myTimeLocation;
-
-        let myZoomCenterX = -0.7;
-        let myZoomCenterY = 0.0;
-        let myZoomSize = 3.0;
-
-        let myPreviewScale = 0.3; 
-        let myCurrentMouseX = window.innerWidth / 2;
-        let myCurrentMouseY = window.innerHeight / 2;
-        let myStartTime = performance.now();
-
-        function myResizeViewports() {
-            const myW = window.innerWidth;
-            const myH = window.innerHeight;
-            
-            if (myGlCanvas.width !== myW || myGlCanvas.height !== myH) {
-                myGlCanvas.width = myW;
-                myGlCanvas.height = myH;
-                myGlContext.viewport(0, 0, myW, myH);
-            }
-            if (myOverlayCanvas.width !== myW || myOverlayCanvas.height !== myH) {
-                myOverlayCanvas.width = myW;
-                myOverlayCanvas.height = myH;
-            }
-        }
-
-        function myRenderFrame() {
-            myResizeViewports();
-
-            myCtx.clearRect(0, 0, myOverlayCanvas.width, myOverlayCanvas.height);
-
-            const myCurrentTime = (performance.now() - myStartTime) / 1000.0;
-            myGlContext.uniform2f(myResolutionLocation, myGlCanvas.width, myGlCanvas.height);
-            myGlContext.uniform2f(myZoomCenterLocation, myZoomCenterX, myZoomCenterY);
-            myGlContext.uniform1f(myZoomSizeLocation, myZoomSize);
-            myGlContext.uniform1f(myTimeLocation, myCurrentTime);
-
-            myGlContext.drawArrays(myGlContext.TRIANGLES, 0, 6);
-
-            const myRectWidth = myOverlayCanvas.width * myPreviewScale;
-            const myRectHeight = myOverlayCanvas.height * myPreviewScale;
-            const myRectX = myCurrentMouseX - myRectWidth / 2;
-            const myRectY = myCurrentMouseY - myRectHeight / 2;
-
-            myCtx.strokeStyle = '#0df';
-            myCtx.lineWidth = 2;
-            myCtx.setLineDash([6, 4]);
-            myCtx.shadowColor = 'rgba(0,0,0,0.5)';
-            myCtx.shadowBlur = 4;
-            myCtx.strokeRect(myRectX, myRectY, myRectWidth, myRectHeight);
-
-            requestAnimationFrame(myRenderFrame);
-        }
-
-        myGlCanvas.onmousemove = (myEvent) => {
-            myCurrentMouseX = myEvent.clientX;
-            myCurrentMouseY = myEvent.clientY;
+            myBufferCtx.putImageData(myImgData, 0, 0);
+            myIsGenerating = false;
+            myRefreshScreen();
         };
 
-        myGlCanvas.onwheel = (myEvent) => {
+        // Redraws screen with cached rendering and overlays the dashed target preview box
+        const myRefreshScreen = () => {
+            myCtx.drawImage(myBufferCanvas, 0, 0);
+
+            const myBoxW = myCanvas.width * myZoomFactor;
+            const myBoxH = myCanvas.height * myZoomFactor;
+            const myBoxX = myMouseX - myBoxW / 2;
+            const myBoxY = myMouseY - myBoxH / 2;
+
+            myCtx.strokeStyle = "rgba(255, 255, 255, 0.85)";
+            myCtx.lineWidth = 1.5;
+            myCtx.setLineDash([6, 4]); // Creates the required dashed preview look
+            myCtx.strokeRect(myBoxX, myBoxY, myBoxW, myBoxH);
+            myCtx.setLineDash([]); 
+        };
+
+        // Primary Event Handlers via direct property assignments
+        myCanvas.onmousemove = (myEvent) => {
+            myMouseX = myEvent.clientX;
+            myMouseY = myEvent.clientY;
+            myRefreshScreen();
+        };
+
+        myCanvas.onwheel = (myEvent) => {
             myEvent.preventDefault();
             if (myEvent.deltaY < 0) {
-                myPreviewScale = Math.max(0.05, myPreviewScale * 0.9);
+                myZoomFactor = Math.max(0.02, myZoomFactor * 0.85);
             } else {
-                myPreviewScale = Math.min(0.95, myPreviewScale * 1.1);
+                myZoomFactor = Math.min(0.90, myZoomFactor * 1.15);
             }
+            myRefreshScreen();
         };
 
-        myGlCanvas.onclick = (myEvent) => {
-            const myFactor = myZoomSize / myGlCanvas.height;
-            const myClickedComplexX = myZoomCenterX + (myEvent.clientX - myGlCanvas.width / 2) * myFactor;
-            const myClickedComplexY = myZoomCenterY - (myEvent.clientY - myGlCanvas.height / 2) * myFactor;
+        myCanvas.onclick = () => {
+            if (myIsGenerating) return; 
 
-            myZoomCenterX = myClickedComplexX;
-            myZoomCenterY = myClickedComplexY;
-            myZoomSize = myZoomSize * myPreviewScale;
+            const myW = myCanvas.width;
+            const myH = myCanvas.height;
+            const myZoomHeight = (myZoomWidth * myH) / myW;
+
+            // Project current mouse view center to plane calculations
+            const myTargetReal = (myCenterX - myZoomWidth / 2) + (myMouseX / myW) * myZoomWidth;
+            const myTargetImag = (myCenterY - myZoomHeight / 2) + (myMouseY / myH) * myZoomHeight;
+
+            myCenterX = myTargetReal;
+            myCenterY = myTargetImag;
+            myZoomWidth = myZoomWidth * myZoomFactor;
+            
+            // Increment detail limits as scale approaches microscopic layers
+            myMaxIterations = Math.floor(myMaxIterations * 1.08); 
+
+            myGenerateFractalData();
         };
 
-        window.onresize = myResizeViewports;
+        // Modal Triggers
+        myHintButton.onclick = () => myInfoModal.style.display = "flex";
+        myCloseButton.onclick = () => myInfoModal.style.display = "none";
+        myInfoModal.onclick = (myEvent) => { if (myEvent.target === myInfoModal) myInfoModal.style.display = "none"; };
 
-        async function myStartAppAsync() {
-            myProgram = await myInitPipelineAsync();
-
-            const myBuffer = myGlContext.createBuffer();
-            myGlContext.bindBuffer(myGlContext.ARRAY_BUFFER, myBuffer);
-            myGlContext.bufferData(myGlContext.ARRAY_BUFFER, new Float32Array([
-                -1, -1,   1, -1,  -1,  1,
-                -1,  1,   1, -1,   1,  1,
-            ]), myGlContext.STATIC_DRAW);
-
-            const myPositionLocation = myGlContext.getAttribLocation(myProgram, "myPosition");
-            myGlContext.enableVertexAttribArray(myPositionLocation);
-            myGlContext.vertexAttribPointer(myPositionLocation, 2, myGlContext.FLOAT, false, 0, 0);
-
-            myResolutionLocation = myGlContext.getUniformLocation(myProgram, "u_myResolution");
-            myZoomCenterLocation = myGlContext.getUniformLocation(myProgram, "u_myZoomCenter");
-            myZoomSizeLocation = myGlContext.getUniformLocation(myProgram, "u_myZoomSize");
-            myTimeLocation = myGlContext.getUniformLocation(myProgram, "u_myTime");
-
-            myResizeViewports();
-            myRenderFrame();
-        }
-
-        myStartAppAsync();
+        window.onresize = myResizeCanvas;
+        myResizeCanvas();
     </script>
 </body>
 </html>
