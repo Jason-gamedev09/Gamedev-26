@@ -25,10 +25,10 @@ function trainHero(){
     else if (myHero.power == 50){
         myHero.comment = 'Pow Status: Damaged-Stable';
     }
-    else if (myHero.power < 40){
+    else if (myHero.power <= 40){
         myHero.comment = 'Pow Status: Unstable';
     }
-     if (myHero.power < 0){
+     if (myHero.power <= 10){
         myHero.comment = 'Pow Status: Critical Failure';
     }
     else if (myHero.power <= 0){
