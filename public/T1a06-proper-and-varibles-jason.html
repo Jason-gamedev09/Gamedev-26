@@ -106,5 +106,28 @@
 
         initTypewriter();
     </script>
+  <br><br><br><br><br><br><br><br><br><br><br><br>
+  <h4>Simple Story Generator</h4>
+
+  <input type="text" id="nameInput" placeholder="Enter a name"><br><br>
+  <input type="text" id="nounInput" placeholder="Enter an object"><br><br>
+  <input type="text" id="placeInput" placeholder="Enter a place"><br><br>
+
+  <button onclick="makeStory()">Create Story</button>
+
+  <p id="output"></p>
+
+  <script>
+    function makeStory() {
+      let name = document.getElementById("nameInput").value;
+      let noun = document.getElementById("nounInput").value;
+      let place = document.getElementById("placeInput").value;
+
+      let story = name + " went to " + place + " to buy a " + noun + ".";
+
+      document.getElementById("output").textContent = story;
+    }
+  </script>
+
 </body>
 </html>
