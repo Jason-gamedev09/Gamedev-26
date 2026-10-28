@@ -7,7 +7,7 @@
 <a href="https://www.w3schools.com/js/js_objects.asp">Good refrence to javascript objects (you find one)</a><br>
 Objects are store named varibles
 
-<h4> Example working Objects code</h4>
+<h3> Example working Objects code</h3>
 
 Nothing; <input type=text id="myText01" value="useless at the moment"><br>
 <script>
@@ -38,3 +38,32 @@ document.getElementById('myDiv02').innerHTML += 'eyecolor: ' +
 <div id='myDiv01'>...</div>
 <div id='myDiv02'>...</div>
   
+<h3> Othe cool things</h3>
+
+<h4>Local website storage using objects</h4>
+
+    <input id="nameInput" placeholder="Enter a name">
+    <input id="ageInput" placeholder="Enter a age">
+    <button onclick="saveData()">Save Object</button>
+    <p id="display"></p>
+
+    <script>
+        let myHuman = JSON.parse(localStorage.getItem('savedHuman')) || { nameFirst: 'John' , age: 39 };
+
+        document.getElementById('nameInput').value = myHuman.nameFirst;
+        document.getElementById('display').innerText = "Object data: " + JSON.stringify(myHuman);
+        
+        document.getElementById('ageInput').value = myHuman.age;
+        document.getElementById('display').innerText = "Object data: " + JSON.stringify(myHuman);
+
+
+        function saveData() {
+            myHuman.nameFirst = document.getElementById('nameInput').value;
+            myHuman.age = document.getElementById('ageInput').value;
+            
+            localStorage.setItem('savedHuman', JSON.stringify(myHuman));
+            document.getElementById('display').innerText = "Object data: " + JSON.stringify(myHuman);
+        }
+    </script>
+<button onclick="localStorage.clear(); location.reload();">Reset Browser Memory</button>
+<h4> </h4>
