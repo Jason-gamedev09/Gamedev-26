@@ -66,4 +66,58 @@ document.getElementById('myDiv02').innerHTML += 'eyecolor: ' +
         }
     </script>
 <button onclick="localStorage.clear(); location.reload();">Reset Browser Memory</button>
+<h4>Mouse particle trail using objects</h4>
+
+<div id="canvasBox" style="width: 400px; height: 300px; border: 2px solid cyan; background: #111; overflow: hidden; position: relative;">
+  <canvas id="canvas" width="400" height="300" style="display: block;"></canvas>
+</div>
+
+<script>
+  const box = document.getElementById('canvasBox');
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+  const particles = [];
+
+  class Particle {
+    constructor(x, y) {
+      this.x = x;
+      this.y = y;
+      this.size = 10;
+      this.speedX = Math.random() * 3 - 1.5;
+      this.speedY = Math.random() * 3 - 1.5;
+    }
+    update() {
+      this.x += this.speedX;
+      this.y += this.speedY;
+      this.size -= 0.2;
+    }
+    draw() {
+      ctx.fillStyle = 'cyan';
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  box.addEventListener('mousemove', (e) => {
+    const rect = box.getBoundingClientRect();
+    particles.push(new Particle(e.clientX - rect.left, e.clientY - rect.top));
+  });
+
+  function animate() {
+    ctx.fillStyle = 'rgba(17, 17, 17, 0.2)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    for (let i = 0; i < particles.length; i++) {
+      particles[i].update();
+      particles[i].draw();
+      if (particles[i].size <= 0.2) {
+        particles.splice(i, 1);
+        i--;
+      }
+    }
+    requestAnimationFrame(animate);
+  }
+  animate();
+</script>
 <h4> </h4>
