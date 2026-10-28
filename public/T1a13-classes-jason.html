@@ -63,3 +63,16 @@ Nothing: <input type=text id="myText01" value="Useless at the moment"><br>
         }
     </script>
 
+<h4> Dark Mode switch using classes </h4>
+<style>
+  body { 
+    background: white; 
+    color: black; 
+    transition: background 0.5s, color 0.5s; 
+  }
+  body.dark { background: black; color: white; }
+</style>
+
+<button onclick="document.body.classList.toggle('dark')">Toggle</button>
+
+<b>Hello World</b>
