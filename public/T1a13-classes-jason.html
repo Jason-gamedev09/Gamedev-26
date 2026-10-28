@@ -16,12 +16,13 @@ Nothing: <input type=text id="myText01" value="Useless at the moment"><br>
     document.getElementById('myDiv01').innerHTML = 'hello ' + this.myName +
 '. You are ' + this.myAge + ' years old<br>'
   }
-} //end class myAnimal
+}
 
   myDog = new myAnimal('Snickers', 5)
   myDog.myShow()
 }">
 <div id="myDiv01">...</div>
+
 
 <h3> Other cool things </h3>
 <h4> Notification trigger using classes</h4>
@@ -32,10 +33,9 @@ Nothing: <input type=text id="myText01" value="Useless at the moment"><br>
     <meta charset="UTF-8">
     <title>Simple Notification Class</title>
     <style>
-        /* A simple container to hold popups in the top corner */
+
         #container { position: fixed; top: 10px; right: 10px; display: flex; flex-direction: column; gap: 5px; }
         
-        /* The basic layout for our popups */
         .alert { background: #333; color: white; padding: 10px 20px; font-family: sans-serif; border-radius: 4px; }
         .success { background: green; }
         .error { background: red; }
@@ -51,18 +51,15 @@ Nothing: <input type=text id="myText01" value="Useless at the moment"><br>
     <script>
         class Popup {
             constructor(text, type) {
-                // 1. Create a div and set its text and styles
+
                 this.el = document.createElement('div');
                 this.el.className = `alert ${type}`;
                 this.el.innerText = text;
 
-                // 2. Throw it into our container on the screen
                 document.getElementById('container').appendChild(this.el);
-
-                // 3. Set a timer to delete it automatically after 2 seconds
+              
                 setTimeout(() => this.el.remove(), 2000);
             }
         }
     </script>
-</body>
-</html>
+
