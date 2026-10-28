@@ -76,3 +76,26 @@ Nothing: <input type=text id="myText01" value="Useless at the moment"><br>
 <button onclick="document.body.classList.toggle('dark')">Toggle</button>
 
 <b>Hello World</b>
+
+<h4> CSS class animation </h4>
+<style>
+  .box { 
+    opacity: 0; 
+    transform: scale(0.5); 
+    transition: all 0.5s; 
+    background: coral; 
+    padding: 20px; 
+  }
+
+  .box.pop { 
+    opacity: 1; 
+    transform: scale(1); 
+  }
+</style>
+
+<button onclick="document.getElementById('myBox').classList.add('pop')">Animate</button>
+<button onclick="document.getElementById('myBox').classList.remove('pop')">Reset</button>
+
+<div class="box" id="myBox">
+  <h2>Surprise! 🎉</h2>
+</div>
