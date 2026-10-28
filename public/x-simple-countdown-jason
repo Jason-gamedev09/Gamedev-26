@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Countdown to November 19, 2026</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #121212;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        h1 {
+            font-weight: 400;
+            margin-bottom: 20px;
+            letter-spacing: 1px;
+        }
+
+        .countdown-container {
+            display: flex;
+            gap: 20px;
+        }
+
+        .time-block {
+            background: #1e1e1e;
+            padding: 20px 30px;
+            border-radius: 8px;
+            min-width: 80px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .number {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #00adb5;
+            display: block;
+        }
+
+        .label {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            color: #888;
+            letter-spacing: 2px;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 600px) {
+            .countdown-container {
+                gap: 10px;
+            }
+            .time-block {
+                padding: 15px 20px;
+                min-width: 60px;
+            }
+            .number {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>November 19, 2026 Countdown</h1>
+
+    <div class="countdown-container">
+        <div class="time-block">
+            <span class="number" id="days">00</span>
+            <span class="label">Days</span>
+        </div>
+        <div class="time-block">
+            <span class="number" id="hours">00</span>
+            <span class="label">Hours</span>
+        </div>
+        <div class="time-block">
+            <span class="number" id="minutes">00</span>
+            <span class="label">Minutes</span>
+        </div>
+        <div class="time-block">
+            <span class="number" id="seconds">00</span>
+            <span class="label">Seconds</span>
+        </div>
+    </div>
+
+    <script>
+        // Set the target date: November 19, 2026 00:00:00
+        const targetDate = new Date("Nov 19, 2026 00:00:00").getTime();
+
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const difference = targetDate - now;
+
+            // Check if the date has already passed
+            if (difference < 0) {
+                document.querySelector(".countdown-container").innerHTML = "<h2>The event has arrived!</h2>";
+                clearInterval(intervalId);
+                return;
+            }
+
+            // Time calculations for days, hours, minutes and seconds
+            const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
+            // Update DOM and add leading zeros if necessary
+            document.getElementById("days").innerText = days.toString().padStart(2, '0');
+            document.getElementById("hours").innerText = hours.toString().padStart(2, '0');
+            document.getElementById("minutes").innerText = minutes.toString().padStart(2, '0');
+            document.getElementById("seconds").innerText = seconds.toString().padStart(2, '0');
+        }
+
+        // Run the timer immediately on load
+        updateCountdown();
+        
+        // Update the countdown every 1 second
+        const intervalId = setInterval(updateCountdown, 1000);
+    </script>
+
+</body>
+</html>
