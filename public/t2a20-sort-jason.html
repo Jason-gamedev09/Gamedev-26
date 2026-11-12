@@ -14,15 +14,21 @@
   <input type=button value="Show" onclick="{
     let myTemp = ''
      for (let myLoop = 0;  myLoop < myMax; myLoop++){
-    myTemp =+ myLoop + ' = '+ myCards[myLoop] + '<br>'
+    myTemp += myLoop + ' = '+ myCards[myLoop] + '<br>'
   }
     document.getElementById('myDiv01').innerHTML = myTemp
 }">
 
 <input type=button value="sort" onclick="{
   let myTemp = 0
-  for (let myLoop = 0; myLoop < myMax; myLoop++){
-      myCards[myLoop] = 0 
+  for (let myOuter = 0; myOuter < myMax; myOuter++){
+     for (let myLoop = 0; myLoop < myMax - 1; myLoop++){
+        if (myCards[myLoop] > myCards[myLoop + 1]){
+           myTemp = myCards[myLoop]
+           myCards[myLoop] = myCards[myLoop + 1]
+           myCards[myLoop + 1] = myTemp
+     }
+    }
   }
 }">
 <div id="myDiv01"></div>
