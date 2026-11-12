@@ -1,25 +1,43 @@
 <h1 align=center>t2a20-sort-jason.html</h1>
 
 <script>
-   let myMax = 3    //52 when working
+   let myMax = 52    //52 when working
    let myCards = new Array(myMax)
+   
+   // script for animation
+   const mySleep = (ms) => new Promise(r => setTimeout(r, ms))
+
+   function myShow(spot1 = -1, spot2 = -1) {
+   let myTemp = ''
+   for (let myLoop = 0; myLoop < myMax; myLoop++){
+      if (myLoop === spot1 || myLoop === spot2) {
+
+         myTemp += '<mark style="background:yellow; font-weight:bold;">' + myLoop + ' = ' + myCards[myLoop] + '</mark><br>'
+      } else {
+         myTemp += myLoop + ' = ' + myCards[myLoop] + '<br>'
+      }
+   }
+   document.getElementById('myDiv01').innerHTML = myTemp
+}
+
 </script>
 
-<input type=button value="Set Random" onclick="{
+<input type=button value="Set Random" onclick="(async () => {
    for (let myLoop = 0;  myLoop < myMax; myLoop++){
       myCards[myLoop] = Math.floor(Math.random()*10)
     }
-  }">
+    myShow()
+  })()">
 
-  <input type=button value="Show" onclick="{
+  <input type=button value="Show" onclick="(async () => {
     let myTemp = ''
      for (let myLoop = 0;  myLoop < myMax; myLoop++){
     myTemp += myLoop + ' = '+ myCards[myLoop] + '<br>'
   }
     document.getElementById('myDiv01').innerHTML = myTemp
-}">
+})()">
 
-<input type=button value="sort" onclick="{
+<input type=button value="sort" onclick="(async () => {
   let myTemp = 0
   for (let myOuter = 0; myOuter < myMax; myOuter++){
      for (let myLoop = 0; myLoop < myMax - 1; myLoop++){
@@ -27,8 +45,59 @@
            myTemp = myCards[myLoop]
            myCards[myLoop] = myCards[myLoop + 1]
            myCards[myLoop + 1] = myTemp
+           
+           myShow(myLoop, myLoop + 1)
+           await mySleep(300)
      }
     }
   }
-}">
+  myShow()
+})()">
 <div id="myDiv01"></div>
+
+<h2> Other sort methods</h2>
+
+<h3>Selection Sort</h3>
+<input type=button value="Selection Sort" onclick="(async () => {
+  let myTemp = 0
+  for (let myOuter = 0; myOuter < myMax - 1; myOuter++){
+     let myMinIndex = myOuter
+     for (let myLoop = myOuter + 1; myLoop < myMax; myLoop++){
+        if (myCards[myLoop] < myCards[myMinIndex]){
+           myMinIndex = myLoop
+        }
+     }
+     myTemp = myCards[myOuter]
+     myCards[myOuter] = myCards[myMinIndex]
+     myCards[myMinIndex] = myTemp
+     
+          myShow(myOuter, myMinIndex)
+     await mySleep(300)
+  }
+  myShow
+})()">
+
+<h3>Insertion Sort</h3>
+<input type=button value="Insertion Sort" onclick="(async () => {
+  for (let myOuter = 1; myOuter < myMax; myOuter++){
+     let myCurrent = myCards[myOuter]
+     let myLoop = myOuter - 1
+     while (myLoop >= 0 && myCards[myLoop] > myCurrent){
+        myCards[myLoop + 1] = myCards[myLoop]
+        myLoop--
+        
+        myShow(myLoop, myLoop + 1)
+        await mySleep(300)
+     }
+     myCards[myLoop + 1] = myCurrent
+     myShow()
+  }
+})()">
+
+<h3> Built In Java Sort</h3>
+<input type=button value="Built-in Sort" onclick="(async () => {
+  myCards.sort(function(a, b){
+     return a - b
+  })
+  myShow()
+})()">
