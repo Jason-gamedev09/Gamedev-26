@@ -1,7 +1,7 @@
 
 
 
-<body id="myBody" style="background-repeat:repeat; background-size: 80%" background="myBackground01.jpg">
+<body id="myBody" style="background-image: url('https://media.forgecdn.net/attachments/855/885/2024-04-28_20.png'); background-repeat: repeat-x; background-size: cover; background-attachment: fixed; margin: 0; height: 100vh;">
 
 <h1 align=center>t2a18-game-template-fred</h1>
 <br><br><br><br>
@@ -49,8 +49,8 @@ function myCheckHit(){
 
 </script>
 
-<img id="myImg01" style="position:absolute; width:100px; height:80px; top:180px; left:50px;"  src="https://p.novaskin.me/5094573026.png">
-<img id="myImg02" style="position:absolute; width:100px; height:80px; top:180px; left:250px;" src="https://media.forgecdn.net/attachments/8/463/Cave_Entrance.png">
+<img id="myImg01" style="position:absolute; width:100px; height:80px; top:600px; left:50px;"  src="https://p.novaskin.me/5094573026.png">
+<img id="myImg02" style="position:absolute; width:100px; height:80px; top:600px; left:250px;" src="https://media.forgecdn.net/attachments/8/463/Cave_Entrance.png">
 
 <input type=button value="Auto Background Left" onclick="{
   clearInterval(myClock)
@@ -68,5 +68,3 @@ function myCheckHit(){
   document.getElementById('myImg01').style.left = parseInt(document.getElementById('myImg01').style.left) + 10 + 'px'
   myCheckHit()     // checks for all collisions
 }"><br><br>
-
-
