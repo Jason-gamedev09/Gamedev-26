@@ -76,3 +76,38 @@ if (myString[myLoop] == 'r') {myTemp = 'z'}
   document.getElementById('myArea02').value = myString.join('')
 }"><br><br>
 Some cool words that encrypt into another word: fun=box, rum=you, our=joy, full=boss,
+
+<h2>Other Encryptions</h2>
+<h3>Caesar Cypher</h3>
+<!DOCTYPE html>
+<html>
+<body>
+    <h2>Scrambler</h2>
+    Shift: <input type="number" id="shift" value="3"><br><br>
+
+    1. Input: <input type="text" id="input" value="Hello World!"><br>
+    <button onclick="run(1, 'input', 'scrambled')">Scramble ▼</button><br><br>
+
+    2. Scrambled: <input type="text" id="scrambled"><br>
+    <button onclick="run(-1, 'scrambled', 'result')">Unscramble ▼</button><br><br>
+
+    3. Result: <input type="text" id="result" readonly>
+
+    <script>
+    function run(dir, srcId, destId) {
+        let text = document.getElementById(srcId).value;
+        let num = (parseInt(document.getElementById("shift").value) || 0) * dir;
+        let shift = ((num % 26) + 26) % 26;
+        let out = "";
+
+        for (let i = 0; i < text.length; i++) {
+            let c = text.charCodeAt(i);
+            if (c >= 65 && c <= 90) out += String.fromCharCode((c - 65 + shift) % 26 + 65);
+            else if (c >= 97 && c <= 122) out += String.fromCharCode((c - 97 + shift) % 26 + 97);
+            else out += text.charAt(i);
+        }
+        document.getElementById(destId).value = out;
+    }
+    </script>
+</body>
+</html>
