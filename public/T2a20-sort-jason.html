@@ -101,3 +101,32 @@
   })
   myShow()
 })()">
+
+<h3>Bogosort (Randomly Sorts)</h3>
+<input type=button value="Bogosort" onclick="(async () => {
+  let isSorted = false
+  
+  while (!isSorted) {
+    // Shuffle the cards randomly
+    for (let myLoop = myMax - 1; myLoop > 0; myLoop--) {
+      let randIndex = Math.floor(Math.random() * (myLoop + 1))
+      let myTemp = myCards[myLoop]
+      myCards[myLoop] = myCards[randIndex]
+      myCards[randIndex] = myTemp
+      
+      // Move this inside the loop so it can highlight each swap as it happens
+      myShow(myLoop, randIndex)
+      await mySleep(200)
+    }
+
+    // Check if sorted
+    isSorted = true
+    for (let myLoop = 0; myLoop < myMax - 1; myLoop++) {
+      if (myCards[myLoop] > myCards[myLoop + 1]) {
+        isSorted = false
+        break
+      }
+    }
+  }
+  myShow()
+})()">
