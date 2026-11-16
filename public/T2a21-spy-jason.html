@@ -106,3 +106,35 @@ Some cool words that encrypt into another word: fun=box, rum=you, our=joy, full=
         document.getElementById(destId).value = out;
     }
     </script>
+
+<h3>One time pass code encryption</h3>
+    <input type="text" id="msg" value="HELLO"> Message<br>
+    <input type="text" id="key" value="SECRET"> Key ( has to be as long as the message)<br><br>
+    
+    <button onclick="encrypt()">Encrypt</button>
+    <button onclick="decrypt()">Decrypt</button><br><br>
+    
+    <input type="text" id="res"> Result
+    
+    <script>
+        function encrypt() {
+            let m = document.getElementById('msg').value;
+            let k = document.getElementById('key').value;
+            let out = "";
+            for (let i = 0; i < m.length; i++) {
+                out += String.fromCharCode(m.charCodeAt(i) + k.charCodeAt(i));
+            }
+            document.getElementById('res').value = out;
+        }
+
+        function decrypt() {
+            let r = document.getElementById('res').value;
+            let k = document.getElementById('key').value;
+            let out = "";
+            for (let i = 0; i < r.length; i++) {
+                out += String.fromCharCode(r.charCodeAt(i) - k.charCodeAt(i));
+            }
+            document.getElementById('res').value = out;
+        }
+    </script>
+
