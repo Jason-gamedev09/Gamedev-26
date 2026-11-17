@@ -9,7 +9,7 @@
 
    function myShow(spot1 = -1, spot2 = -1) {
    let myTemp = ''
-   for (let myLoop = 0; myLoop < myMax; myLoop++){
+   for (let myLoop = 0; myLoop < myCards.length; myLoop++){
       if (myLoop === spot1 || myLoop === spot2) {
 
          myTemp += '<mark style="background:yellow; font-weight:bold;">' + myLoop + ' = ' + myCards[myLoop] + '</mark><br>'
