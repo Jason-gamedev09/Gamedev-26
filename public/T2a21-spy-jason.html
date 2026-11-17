@@ -140,52 +140,55 @@ Some cool words that encrypt into another word: fun=box, rum=you, our=joy, full=
 
 <h3>Enigma Machine Encryption</h3>
 
-    <h2>Simple Enigma Machine</h2>
+<div id="enigma-widget" translate="no" class="notranslate">
 
-    <label>Rotor Position (A-Z): </label>
-    <input type="text" id="rotor" value="A" maxlength="1" size="2"><br><br>
+    <label for="enigma-rotor">Rotor Position (A-Z): </label>
+    <input type="text" id="enigma-rotor" value="A" maxlength="1" size="2"><br><br>
 
-    <textarea id="input" rows="4" cols="40" placeholder="Enter message..."></textarea><br><br>
-    <button onclick="runEnigma()">Encrypt / Decrypt</button>
+    <textarea id="enigma-input" rows="4" cols="40" placeholder="Enter message..."></textarea><br><br>
+    <button type="button" onclick="runEnigma()">Encrypt / Decrypt</button>
 
     <h3>Result:</h3>
-    <textarea id="output" rows="4" cols="40" readonly></textarea>
+    <textarea id="enigma-output" rows="4" cols="40" readonly></textarea>
 
     <script>
-        const ALPHABET  = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        const ROTOR     = "EKMFLGDQVZNTOWYHXUSPAIBRCJ";
-        const REFLECTOR = "YRUHQSLDPXNGOKMIEBFZCWVJAT";
+        (function() {
+            const ALPHABET  = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            const ROTOR     = "EKMFLGDQVZNTOWYHXUSPAIBRCJ";
+            const REFLECTOR = "YRUHQSLDPXNGOKMIEBFZCWVJAT";
 
-        function runEnigma() {
-            const text = document.getElementById("input").value.toUpperCase();
-            let pos = Math.max(0, ALPHABET.indexOf(document.getElementById("rotor").value.toUpperCase()));
-            let result = "";
+            window.runEnigma = function() {
+                const text = document.getElementById("enigma-input").value.toUpperCase();
+                let pos = Math.max(0, ALPHABET.indexOf(document.getElementById("enigma-rotor").value.toUpperCase()));
+                let result = "";
 
-            for (let char of text) {
-                let index = ALPHABET.indexOf(char);
-                if (index === -1) {
-                    result += char;
-                    continue;
+                for (let char of text) {
+                    let index = ALPHABET.indexOf(char);
+                    if (index === -1) {
+                        result += char;
+                        continue;
+                    }
+
+                    pos = (pos + 1) % 26;
+
+                    let shiftedIn = (index + pos) % 26;
+                    let rotorOut = ALPHABET.indexOf(ROTOR[shiftedIn]);
+                    let afterRotor = (rotorOut - pos + 26) % 26;
+
+                    let reflected = ALPHABET.indexOf(REFLECTOR[afterRotor]);
+
+                    let shiftedBack = (reflected + pos) % 26;
+                    let rotorBack = ROTOR.indexOf(ALPHABET[shiftedBack]);
+                    let finalIndex = (rotorBack - pos + 26) % 26;
+
+                    result += ALPHABET[finalIndex];
                 }
 
-                pos = (pos + 1) % 26;
-
-                let shiftedIn = (index + pos) % 26;
-                let rotorOut = ALPHABET.indexOf(ROTOR[shiftedIn]);
-                let afterRotor = (rotorOut - pos + 26) % 26;
-
-                let reflected = ALPHABET.indexOf(REFLECTOR[afterRotor]);
-
-                let shiftedBack = (reflected + pos) % 26;
-                let rotorBack = ROTOR.indexOf(ALPHABET[shiftedBack]);
-                let finalIndex = (rotorBack - pos + 26) % 26;
-
-                result += ALPHABET[finalIndex];
-            }
-
-            document.getElementById("output").value = result;
-        }
-    </script>
-Instructions: 
-1. Input phrase or word and select rotor position then click encrypt
-2. To decrypt copy the encrypted result into the input and click the button on the same rotor position as the encryption
+                document.getElementById("enigma-output").value = result;
+            };
+        })();
+    </script><br>
+Instructions: <br>
+1. Input phrase or word and select rotor position then click encrypt <br>
+2. To decrypt copy the encrypted result into the input and click the button on the same rotor position as the encryption <br>
+</div>
