@@ -130,3 +130,25 @@
   }
   myShow()
 })()">
+
+<h3>Stalin Sort (It makes any number out of line disapear)</h3>
+
+<h3>Stalin Sort (Eliminates Out-of-Order Items)</h3>
+<input type=button value="Stalin Sort" onclick="(async () => {
+  let myCurrentMax = myCards[0]
+  let myLoop = 1
+  
+  while (myLoop < myCards.length) {
+    myShow(myLoop - 1, myLoop)
+    await mySleep(300)
+
+    if (myCards[myLoop] >= myCurrentMax) {
+      myCurrentMax = myCards[myLoop]
+      myLoop++
+    } else {
+      // Eliminate the out-of-order card from the array
+      myCards.splice(myLoop, 1)
+    }
+  }
+  myShow()
+})()">
