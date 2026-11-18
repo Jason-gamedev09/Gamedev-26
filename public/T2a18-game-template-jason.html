@@ -35,12 +35,12 @@ function myHitOther(my1,my2){
 
 function myCheckHit(){
    if ( myHitOther('myImg01','myImg02') ){
-       alert('you win')  
+       alert('you win (you hit goal img2)')  
        document.getElementById('myImg01').style.left = '20px'
        location = 't2a13-keydown.html'  // go to your next level
    }
    if ( myHitOther('myImg01','myImg03') ){
-       alert('you lose')  
+       alert('you lose (you hit enemy img3)')  
        document.getElementById('myImg01').style.left = '20px'
    }
    
@@ -52,7 +52,7 @@ function myCheckHit(){
 </script>
 
 <img id="myImg01" style="position:absolute; width:100px; height:80px; top:750px; left:50px;"  src="">
-<img id="myImg02" style="position:absolute; width:100px; height:80px; top:750px; left:450px;" src="">
+<img id="myImg02" style="position:absolute; width:100px; height:80px; top:600px; left:450px;" src="">
 <img id="myImg03" style="position:absolute; width:100px; height:80px; top:750px; left:250px;" src="">
 
 <input type=button value="Auto Background Left" onclick="{
@@ -69,6 +69,11 @@ function myCheckHit(){
 
 <input type=button value="Image Right Fast Button" ontouchStart="{this.click(); event.preventDefault();}" onclick="{
   document.getElementById('myImg01').style.left = parseInt(document.getElementById('myImg01').style.left) + 10 + 'px'
+  myCheckHit()     // checks for all collisions
+}"><br><br>
+
+<input type=button value="Image up Fast Button" ontouchStart="{this.click(); event.preventDefault();}" onclick="{
+  document.getElementById('myImg01').style.top = parseInt(document.getElementById('myImg01').style.top) - 10 + 'px'
   myCheckHit()     // checks for all collisions
 }"><br><br>
 
