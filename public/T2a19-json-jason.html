@@ -6,7 +6,7 @@
     let data =  await response.json();
     console.log(data);
 
-    data = { image: data.image || data.url || data.message || data.file || (Array.isArray(data) ? data[0]?.url : '') };
+    data = { image: data.image || data.url || data.message || data.file || data.sprites?.other?.['official-artwork']?.front_default || data.sprites?.front_default || (Array.isArray(data) ? data[0]?.url : '') };
 
     const myJson = JSON.stringify(data, null, 2);
     document.getElementById('myDiv1').innerHTML = `<pre>${myJson}</pre>`;
