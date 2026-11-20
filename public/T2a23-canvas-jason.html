@@ -174,6 +174,153 @@ Click the button to draw basic shapes, then ask AI to help you add more!<br><br>
 
   myContext.stroke();
 
+  // 13. Draw a Lamborghini (below everything, centered at y=300 to 380)
+  // Rear spoiler
+  myContext.fillStyle = '#111';
+  myContext.fillRect(320, 313, 8, 17);   // Spoiler strut
+  myContext.fillRect(312, 308, 24, 5);   // Spoiler wing
+
+  // Wedge-shaped body (lime green)
+  myContext.beginPath();
+  myContext.moveTo(315, 360);  // Rear bumper bottom
+  myContext.lineTo(318, 330);  // Rear deck
+  myContext.lineTo(365, 327);  // Engine cover
+  myContext.lineTo(395, 307);  // Roof peak
+  myContext.lineTo(455, 333);  // Steep windshield slope
+  myContext.lineTo(505, 347);  // Sharp front nose
+  myContext.lineTo(502, 360);  // Front splitter
+  myContext.closePath();
+
+  myContext.fillStyle = '#76ff03'; // Lambo lime green
+  myContext.fill();
+  myContext.lineWidth = 2;
+  myContext.strokeStyle = 'black';
+  myContext.stroke();
+
+  // Tinted side window
+  myContext.beginPath();
+  myContext.moveTo(382, 328);
+  myContext.lineTo(398, 312);
+  myContext.lineTo(445, 332);
+  myContext.closePath();
+  myContext.fillStyle = '#222';
+  myContext.fill();
+
+  // Side air intake vent
+  myContext.beginPath();
+  myContext.moveTo(365, 337);
+  myContext.lineTo(382, 337);
+  myContext.lineTo(376, 353);
+  myContext.lineTo(360, 353);
+  myContext.closePath();
+  myContext.fillStyle = '#111';
+  myContext.fill();
+
+  // Headlight
+  myContext.beginPath();
+  myContext.moveTo(485, 343);
+  myContext.lineTo(502, 348);
+  myContext.lineTo(488, 351);
+  myContext.closePath();
+  myContext.fillStyle = 'yellow';
+  myContext.fill();
+
+  // Rear wheel (tire + silver rim)
+  myContext.beginPath();
+  myContext.arc(352, 360, 18, 0, 2 * Math.PI);
+  myContext.fillStyle = '#111';
+  myContext.fill();
+  myContext.beginPath();
+  myContext.arc(352, 360, 9, 0, 2 * Math.PI);
+  myContext.fillStyle = '#ccc';
+  myContext.fill();
+
+  // Front wheel (tire + silver rim)
+  myContext.beginPath();
+  myContext.arc(465, 360, 18, 0, 2 * Math.PI);
+  myContext.fillStyle = '#111';
+  myContext.fill();
+  myContext.beginPath();
+  myContext.arc(465, 360, 9, 0, 2 * Math.PI);
+  myContext.fillStyle = '#ccc';
+  myContext.fill();
+
+    // 14. Draw a 1993 Ferrari Testarossa (smooth fastback slope into the rear)
+  // Main car body
+  myContext.beginPath();
+  myContext.moveTo(75, 360);   // Rear bumper bottom
+  myContext.lineTo(75, 332);   // Rear tail top
+  myContext.lineTo(148, 310);  // Smooth fastback slope straight up to cab roof
+  myContext.lineTo(174, 310);  // Flat cab roof top
+  myContext.lineTo(212, 333);  // Windshield slope
+  myContext.lineTo(268, 345);  // Low Ferrari nose
+  myContext.lineTo(265, 360);  // Front lip
+  myContext.closePath();
+  myContext.fillStyle = '#d40000';
+  myContext.fill();
+  myContext.lineWidth = 2;
+  myContext.strokeStyle = 'black';
+  myContext.stroke();
+
+  // Fastback triangle panel line (defines the flying buttress rear pillar)
+  myContext.beginPath();
+  myContext.moveTo(75, 332);
+  myContext.lineTo(148, 310);
+  myContext.lineTo(132, 331);
+  myContext.closePath();
+  myContext.fillStyle = '#b80000'; // Slightly darker red for rear pillar depth
+  myContext.fill();
+  myContext.stroke();
+
+  // Tinted side window
+  myContext.beginPath();
+  myContext.moveTo(140, 331);
+  myContext.lineTo(151, 314);
+  myContext.lineTo(172, 314);
+  myContext.lineTo(202, 332);
+  myContext.closePath();
+  myContext.fillStyle = '#222';
+  myContext.fill();
+
+  // Iconic Testarossa side strakes (cooling slats)
+  myContext.strokeStyle = '#111';
+  myContext.lineWidth = 2;
+  for (let s = 0; s < 4; s++) {
+    let strakeY = 338 + (s * 4);
+    myContext.beginPath();
+    myContext.moveTo(118, strakeY);
+    myContext.lineTo(175, strakeY);
+    myContext.stroke();
+  }
+
+  // Yellow Ferrari Scuderia fender shield
+  myContext.fillStyle = 'gold';
+  myContext.fillRect(218, 338, 6, 7);
+
+  // Front fog light & turn signal
+  myContext.fillStyle = 'yellow';
+  myContext.fillRect(256, 350, 9, 4);
+
+  // Rear wheel (tire + silver rim)
+  myContext.beginPath();
+  myContext.arc(110, 360, 18, 0, 2 * Math.PI);
+  myContext.fillStyle = '#111';
+  myContext.fill();
+  myContext.beginPath();
+  myContext.arc(110, 360, 9, 0, 2 * Math.PI);
+  myContext.fillStyle = '#ddd';
+  myContext.fill();
+
+  // Front wheel (tire + silver rim)
+  myContext.beginPath();
+  myContext.arc(228, 360, 18, 0, 2 * Math.PI);
+  myContext.fillStyle = '#111';
+  myContext.fill();
+  myContext.beginPath();
+  myContext.arc(228, 360, 9, 0, 2 * Math.PI);
+  myContext.fillStyle = '#ddd';
+  myContext.fill();
+
 
 }"><br><br>
 
