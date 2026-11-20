@@ -217,6 +217,64 @@ function showCookies() {
             '\nTotal Cookies: ' + cookieArray.length;
     }
 }
+function browserInfo() {
+
+    document.myForm.myTextarea.value = '';
+
+    var info = navigator;
+
+    document.myForm.myTextarea.value =
+        'COOL BROWSER INFORMATION\n\n';
+
+    document.myForm.myTextarea.value +=
+        'Browser App Name = ' + info.appName + '\n';
+
+    document.myForm.myTextarea.value +=
+        'Browser Version = ' + info.appVersion + '\n';
+
+    document.myForm.myTextarea.value +=
+        'User Agent = ' + info.userAgent + '\n';
+
+    document.myForm.myTextarea.value +=
+        'Platform = ' + info.platform + '\n';
+
+    document.myForm.myTextarea.value +=
+        'Language = ' + info.language + '\n';
+
+    document.myForm.myTextarea.value +=
+        'Online Status = ' + info.onLine + '\n';
+
+    document.myForm.myTextarea.value +=
+        'Cookies Enabled = ' + info.cookieEnabled + '\n';
+
+    document.myForm.myTextarea.value +=
+        'Screen Width = ' + screen.width + '\n';
+
+    document.myForm.myTextarea.value +=
+        'Screen Height = ' + screen.height + '\n';
+
+    document.myForm.myTextarea.value +=
+        'Available Screen Width = ' + screen.availWidth + '\n';
+
+    document.myForm.myTextarea.value +=
+        'Available Screen Height = ' + screen.availHeight + '\n';
+
+    document.myForm.myTextarea.value +=
+        'Screen Colour Depth = ' + screen.colorDepth + '\n';
+
+    document.myForm.myTextarea.value +=
+        'Window Width = ' + window.innerWidth + '\n';
+
+    document.myForm.myTextarea.value +=
+        'Window Height = ' + window.innerHeight + '\n';
+
+    document.myForm.myTextarea.value +=
+        'Current Page = ' + window.location.href + '\n';
+
+    document.myForm.myTextarea.value +=
+        'History Length = ' + window.history.length + '\n';
+
+}
 </script></head>
 
 
@@ -292,7 +350,7 @@ Use the first 15 buttons to decide on what words to enter for the last 5 buttons
 <input type=button id="my10" value="13 document.myForm2.myText1" onclick="{myObjectData(document.myForm2.myText1)}">
 <input type=button value="14 document.getElementById('myText2')" onclick="{myObjectData(document.getElementById('myText2'))}">
 <input type=button value="15 Show Cookies" onclick="{showCookies()}">
-<input type=button value="16 " onclick="{myObjectData()}">
+<input type=button value="16 Browser Info" onclick="{browserInfo()}">
 <input type=button value="17 " onclick="{myObjectData()}">
 <input type=button value="18 " onclick="{myObjectData()}">
 <input type=button value="19 " onclick="{myObjectData()}">
