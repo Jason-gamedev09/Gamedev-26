@@ -1,1 +1,41 @@
+<h2 align="center">T2a23-canvas-jason.html</h2>
+Click the button to draw basic shapes, then ask AI to help you add more!<br><br>
 
+<input type="button" value="Draw Basic Shapes" onclick="{
+  // 1. Clear the canvas first so shapes don't over lap when clicked twice
+  myContext.clearRect(0, 0, myCanvas.width, myCanvas.height);
+
+  // 2. Draw a single line
+  myContext.beginPath();
+  myContext.lineWidth = 3;
+  myContext.strokeStyle = 'black'
+  myContext.moveTo(20, 20);    //start point (x, y)
+  myContext.LineTo(150, 20);    //end point (x, y)
+  myContext.stroke();
+
+  // 3. Draw a solid rectangle
+  myContext.fillStyle = 'blue';
+  myContext.fillRect(30, 50, 100, 60); // (x, y, width, height)
+
+  //4. Draw circle
+  myContext.beginPath();
+  myContext.lineWidth = 5;
+  myContext.strokeStyle = 'green'
+  myContext.arc(220, 80, 40, 0, 2 * Math.PI); // (x, y, radius, start, end)
+  myContext.stroke();
+
+  // 5. Write some text
+  myContext.fillStyle = 'red';
+  myCOntext.font = '24px Arial';
+  myCOntext.fillText('Hello World!' , 30, 180); //('text', x, y)
+}"><br><br>
+
+<!-- Smaller canvas so everything fits on 3/4 of page --->
+<canvas id="myCoolTag" width="500" height="300" style="border:1px solid #000000;"></canvas>
+
+<script>
+  //Set up global varibles
+  let myCanvas = document.getElementById('myCoolTag');
+  let myContext = myCanva.getContext('2d');
+</script>
+</script>
