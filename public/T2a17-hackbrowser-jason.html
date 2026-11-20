@@ -146,7 +146,47 @@ function moreAnimations(){
 
 
 
+function websiteInfo() {
 
+    var address = document.myForm2.webAddress.value;
+
+    if (address.indexOf('://') == -1) {
+        address = 'https://' + address;
+    }
+
+    document.myForm.myTextarea.value = '';
+
+    try {
+        var myWebsite = new URL(address);
+
+        for (var prop in myWebsite) {
+            document.myForm.myTextarea.value +=
+            'Website.' + prop + '=' + myWebsite[prop] + '\n';
+        }
+
+        document.myForm.myTextarea.value +=
+        'Website.hostname=' + myWebsite.hostname + '\n';
+
+        document.myForm.myTextarea.value +=
+        'Website.protocol=' + myWebsite.protocol + '\n';
+
+        document.myForm.myTextarea.value +=
+        'Website.pathname=' + myWebsite.pathname + '\n';
+
+        document.myForm.myTextarea.value +=
+        'Website.port=' + myWebsite.port + '\n';
+
+        document.myForm.myTextarea.value +=
+        'Website.search=' + myWebsite.search + '\n';
+
+        sorttext();
+
+    }
+    catch(error) {
+        document.myForm.myTextarea.value =
+        'Please enter a valid web address.';
+    }
+}
 </script></head>
 
 
@@ -222,7 +262,11 @@ Use the first 15 buttons to decide on what words to enter for the last 5 buttons
 <input type=button id="my10" value="13 document.myForm2.myText1" onclick="{myObjectData(document.myForm2.myText1)}">
 <input type=button value="14 document.getElementById('myText2')" onclick="{myObjectData(document.getElementById('myText2'))}">
 <input type=button value="15 " onclick="{myObjectData()}">
-<input type=button value="16 " onclick="{myObjectData()}">
+<input type="text" name="webAddress" size="40"
+value="https://www.google.com">
+
+<input type="button" value="16 Website Info"
+onclick="{websiteInfo()}">
 <input type=button value="17 " onclick="{myObjectData()}">
 <input type=button value="18 " onclick="{myObjectData()}">
 <input type=button value="19 " onclick="{myObjectData()}">
