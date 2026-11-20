@@ -28,14 +28,160 @@ Click the button to draw basic shapes, then ask AI to help you add more!<br><br>
   myContext.fillStyle = 'red';
   myContext.font = '24px Arial';
   myContext.fillText('Hello World!' , 30, 180); //('text', x, y)
+  
+    // 6. Draw a triangle
+  myContext.beginPath();
+  myContext.moveTo(350, 40);   // Top corner (x, y)
+  myContext.lineTo(300, 120);  // Bottom-left corner (x, y)
+  myContext.lineTo(400, 120);  // Bottom-right corner (x, y)
+  myContext.closePath();       // Connects back to the top corner
+
+  myContext.fillStyle = 'orange';
+  myContext.fill();            // Fills the inside with color
+  myContext.lineWidth = 3;
+  myContext.strokeStyle = 'purple';
+  myContext.stroke();          // Draws the outline
+  
+    // 7. Draw 6 smaller stars in a row across the bottom
+  for (let i = 0; i < 6; i++) {
+    let x = 60 + (i * 75);  // Starts at x=60, moves 75px right each loop
+    let y = 240;            // Vertical center of the row
+
+    myContext.beginPath();
+    myContext.moveTo(x, y - 25);       // Top tip
+    myContext.lineTo(x + 7, y - 8);    // Inner right-top
+    myContext.lineTo(x + 25, y - 8);   // Outer right tip
+    myContext.lineTo(x + 11, y + 4);   // Inner right-bottom
+    myContext.lineTo(x + 16, y + 22);  // Outer bottom-right tip
+    myContext.lineTo(x, y + 11);       // Inner bottom
+    myContext.lineTo(x - 16, y + 22);  // Outer bottom-left tip
+    myContext.lineTo(x - 11, y + 4);   // Inner left-bottom
+    myContext.lineTo(x - 25, y - 8);   // Outer left tip
+    myContext.lineTo(x - 7, y - 8);    // Inner left-top
+    myContext.closePath();
+
+    myContext.fillStyle = 'white';
+    myContext.fill();
+    myContext.lineWidth = 2;
+    myContext.strokeStyle = 'red';
+    myContext.stroke();
+  }
+
+  // 8. Draw a hexagon (top-right corner)
+  myContext.beginPath();
+  myContext.moveTo(445, 40);   // 1. Top point
+  myContext.lineTo(480, 60);   // 2. Top-right point
+  myContext.lineTo(480, 100);  // 3. Bottom-right point
+  myContext.lineTo(445, 120);  // 4. Bottom point
+  myContext.lineTo(410, 100);  // 5. Bottom-left point
+  myContext.lineTo(410, 60);   // 6. Top-left point
+  myContext.closePath();       // Connects back to top point
+
+  myContext.fillStyle = 'cyan';
+  myContext.fill();
+  myContext.lineWidth = 3;
+  myContext.strokeStyle = 'teal';
+  myContext.stroke();
+
+  // 9. Write text underneath the hexagon
+  myContext.fillStyle = 'teal';
+  myContext.font = 'bold 14px Arial';
+  myContext.textAlign = 'center';
+  myContext.fillText('hexagon is the bestagon', 415, 145);
+  myContext.textAlign = 'left'; // Reset alignment so other text isn't affected
+
+  // 10. Draw a 3D cube (center gap between text and stars)
+  // Front face (medium shade)
+  myContext.beginPath();
+  myContext.moveTo(210, 155);
+  myContext.lineTo(250, 155);
+  myContext.lineTo(250, 195);
+  myContext.lineTo(210, 195);
+  myContext.closePath();
+  myContext.fillStyle = '#e74c3c'; // Medium red
+  myContext.fill();
+  myContext.strokeStyle = 'black';
+  myContext.lineWidth = 2;
+  myContext.stroke();
+
+  // Top face (lightest shade - catches the light)
+  myContext.beginPath();
+  myContext.moveTo(210, 155);
+  myContext.lineTo(230, 138);
+  myContext.lineTo(270, 138);
+  myContext.lineTo(250, 155);
+  myContext.closePath();
+  myContext.fillStyle = '#ff7961'; // Light red
+  myContext.fill();
+  myContext.stroke();
+
+  // Right side face (darkest shade - in shadow)
+  myContext.beginPath();
+  myContext.moveTo(250, 155);
+  myContext.lineTo(270, 138);
+  myContext.lineTo(270, 178);
+  myContext.lineTo(250, 195);
+  myContext.closePath();
+  myContext.fillStyle = '#ab000d'; // Dark red
+  myContext.fill();
+  myContext.stroke();
+
+  // 11. Draw a Complex Spirograph (placed at x=600, y=175 on a 750px wide canvas)
+  myContext.beginPath();
+  myContext.lineWidth = 1.5;
+  myContext.strokeStyle = 'purple';
+
+  let centerX = 600;
+  let centerY = 175;
+  let R = 85;   // Outer circle radius
+  let r = 30;   // Inner rolling circle radius
+  let d = 55;   // Pen distance from center of inner circle
+
+  for (let t = 0; t <= Math.PI * 12; t += 0.05) {
+    let x = centerX + (R - r) * Math.cos(t) + d * Math.cos(((R - r) / r) * t);
+    let y = centerY + (R - r) * Math.sin(t) - d * Math.sin(((R - r) / r) * t);
+
+    if (t === 0) {
+      myContext.moveTo(x, y);
+    } else {
+      myContext.lineTo(x, y);
+    }
+  }
+  myContext.stroke();
+  
+  // 12. Draw a stickman (shifted right to x=770 so it doesn't overlap)
+  myContext.beginPath();
+  myContext.lineWidth = 3;
+  myContext.strokeStyle = 'black';
+
+  // Head
+  myContext.arc(770, 150, 15, 0, 2 * Math.PI);
+
+  // Body
+  myContext.moveTo(770, 165);
+  myContext.lineTo(770, 215);
+
+  // Arms (waving)
+  myContext.moveTo(745, 175);
+  myContext.lineTo(770, 185);
+  myContext.lineTo(795, 165);
+
+  // Legs
+  myContext.moveTo(770, 215);
+  myContext.lineTo(755, 255);
+  myContext.moveTo(770, 215);
+  myContext.lineTo(785, 255);
+
+  myContext.stroke();
+
+
 }"><br><br>
 
 <!-- Smaller canvas so everything fits on 3/4 of page --->
-<canvas id="myCoolTag" width="500" height="300" style="border:1px solid #000000;"></canvas>
+<canvas id="myCoolTag" width="900" height="500" style="border:1px solid #000000;"></canvas>
 
 <script>
   //Set up global varibles
   let myCanvas = document.getElementById('myCoolTag');
   let myContext = myCanvas.getContext('2d');
 </script>
-
