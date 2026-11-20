@@ -275,6 +275,107 @@ function browserInfo() {
         'History Length = ' + window.history.length + '\n';
 
 }
+
+function browserKnowsYou() {
+
+    document.myForm.myTextarea.value = '';
+
+    var n = navigator;
+
+    document.myForm.myTextarea.value =
+        'WHAT YOUR BROWSER KNOWS ABOUT YOU\n\n';
+
+    document.myForm.myTextarea.value +=
+        '--- PERSONAL SETTINGS ---\n';
+
+    document.myForm.myTextarea.value +=
+        'Language = ' + n.language + '\n';
+
+    document.myForm.myTextarea.value +=
+        'Languages = ' + n.languages + '\n';
+
+    document.myForm.myTextarea.value +=
+        'Time Zone = ' +
+        Intl.DateTimeFormat().resolvedOptions().timeZone + '\n';
+
+    document.myForm.myTextarea.value +=
+        'Current Time = ' + new Date() + '\n';
+
+    document.myForm.myTextarea.value +=
+        'Cookies Enabled = ' + n.cookieEnabled + '\n';
+
+    document.myForm.myTextarea.value +=
+        'Do Not Track = ' + n.doNotTrack + '\n';
+
+    document.myForm.myTextarea.value +=
+        'Online = ' + n.onLine + '\n';
+
+    document.myForm.myTextarea.value +=
+        '\n--- DEVICE INFORMATION ---\n';
+
+    document.myForm.myTextarea.value +=
+        'Platform = ' + n.platform + '\n';
+
+    document.myForm.myTextarea.value +=
+        'CPU Cores = ' + n.hardwareConcurrency + '\n';
+
+    document.myForm.myTextarea.value +=
+        'Device Memory = ' + n.deviceMemory + ' GB\n';
+
+    document.myForm.myTextarea.value +=
+        'Touch Points = ' + n.maxTouchPoints + '\n';
+
+    document.myForm.myTextarea.value +=
+        'Screen Resolution = ' +
+        screen.width + ' x ' + screen.height + '\n';
+
+    document.myForm.myTextarea.value +=
+        'Screen Colour Depth = ' + screen.colorDepth + '\n';
+
+    document.myForm.myTextarea.value +=
+        '\n--- BROWSER PREFERENCES ---\n';
+
+    document.myForm.myTextarea.value +=
+        'User Agent = ' + n.userAgent + '\n';
+
+    document.myForm.myTextarea.value +=
+        'PDF Viewer Enabled = ' + n.pdfViewerEnabled + '\n';
+
+    document.myForm.myTextarea.value +=
+        'JavaScript Enabled = Yes\n';
+
+    document.myForm.myTextarea.value +=
+        '\n--- WEBSITE INFORMATION ---\n';
+
+    document.myForm.myTextarea.value +=
+        'Current Website = ' + location.hostname + '\n';
+
+    document.myForm.myTextarea.value +=
+        'Current Page = ' + location.href + '\n';
+
+    document.myForm.myTextarea.value +=
+        'Page Protocol = ' + location.protocol + '\n';
+
+    document.myForm.myTextarea.value +=
+        'Referring Website = ' + document.referrer + '\n';
+
+    document.myForm.myTextarea.value +=
+        '\n--- WINDOW INFORMATION ---\n';
+
+    document.myForm.myTextarea.value +=
+        'Window Width = ' + window.innerWidth + '\n';
+
+    document.myForm.myTextarea.value +=
+        'Window Height = ' + window.innerHeight + '\n';
+
+    document.myForm.myTextarea.value +=
+        'History Entries = ' + history.length + '\n';
+
+    document.myForm.myTextarea.value +=
+        '\n--- END OF BROWSER REPORT ---\n';
+
+}
+
 </script></head>
 
 
@@ -351,7 +452,7 @@ Use the first 15 buttons to decide on what words to enter for the last 5 buttons
 <input type=button value="14 document.getElementById('myText2')" onclick="{myObjectData(document.getElementById('myText2'))}">
 <input type=button value="15 Show Cookies" onclick="{showCookies()}">
 <input type=button value="16 Browser Info" onclick="{browserInfo()}">
-<input type=button value="17 " onclick="{myObjectData()}">
+<input type=button value="17 What Browser Knows" onclick="{browserKnowsYou()}">
 <input type=button value="18 " onclick="{myObjectData()}">
 <input type=button value="19 " onclick="{myObjectData()}">
 <input type=button value="20 " onclick="{myObjectData()}">
