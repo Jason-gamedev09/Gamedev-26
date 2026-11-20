@@ -26,6 +26,28 @@ Text example: <input id="myText1" type=text size=70 value="" placeholder="Write 
    document.getElementById('myText1').value = localStorage.getItem('myStoredText')
 }"> 
 
+<h3>My To-Do List</h3>
+
+<input id="myTodoInput" type="text" size="50" placeholder="Enter a new task...">
+
+<input type="button" value="Add Task" onClick="{
+   let taskText = document.getElementById('myTodoInput').value;
+   if (taskText !== '') {
+      let list = document.getElementById('myList');
+      list.innerHTML += '<li>' + taskText + ' <input type=\'button\' value=\'Remove\' onclick=\'this.parentElement.remove(); localStorage.setItem(&quot;myTodoList&quot;, document.getElementById(&quot;myList&quot;).innerHTML);\'></li>';
+      localStorage.setItem('myTodoList', list.innerHTML);
+      document.getElementById('myTodoInput').value = '';
+   }
+}">
+
+<input type="button" value="Clear All" onClick="{
+   document.getElementById('myList').innerHTML = '';
+   localStorage.removeItem('myTodoList');
+}">
+
+<ul id="myList"></ul>
+
+
 
 
 
