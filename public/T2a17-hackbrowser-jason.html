@@ -376,6 +376,89 @@ function browserKnowsYou() {
 
 }
 
+function browserFingerprint() {
+
+    document.myForm.myTextarea.value = '';
+
+    var n = navigator;
+    var tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+    var fingerprint = '';
+
+    fingerprint += n.userAgent;
+    fingerprint += n.language;
+    fingerprint += n.platform;
+    fingerprint += screen.width;
+    fingerprint += screen.height;
+    fingerprint += screen.colorDepth;
+    fingerprint += window.innerWidth;
+    fingerprint += window.innerHeight;
+    fingerprint += tz;
+    fingerprint += n.hardwareConcurrency;
+    fingerprint += n.maxTouchPoints;
+
+    var hash = 0;
+
+    for (var i = 0; i < fingerprint.length; i++) {
+
+        var character = fingerprint.charCodeAt(i);
+
+        hash = ((hash << 5) - hash) + character;
+
+        hash = hash & hash;
+    }
+
+    var fingerprintID = (hash >>> 0).toString(16);
+
+    document.myForm.myTextarea.value =
+        'BROWSER FINGERPRINT REPORT\n\n';
+
+    document.myForm.myTextarea.value +=
+        'Fingerprint ID = ' + fingerprintID + '\n\n';
+
+    document.myForm.myTextarea.value +=
+        '--- FINGERPRINT COMPONENTS ---\n';
+
+    document.myForm.myTextarea.value +=
+        'Browser = ' + n.userAgent + '\n';
+
+    document.myForm.myTextarea.value +=
+        'Language = ' + n.language + '\n';
+
+    document.myForm.myTextarea.value +=
+        'Platform = ' + n.platform + '\n';
+
+    document.myForm.myTextarea.value +=
+        'Time Zone = ' + tz + '\n';
+
+    document.myForm.myTextarea.value +=
+        'Screen = ' + screen.width + ' x ' +
+        screen.height + '\n';
+
+    document.myForm.myTextarea.value +=
+        'Colour Depth = ' + screen.colorDepth + '\n';
+
+    document.myForm.myTextarea.value +=
+        'Window = ' + window.innerWidth + ' x ' +
+        window.innerHeight + '\n';
+
+    document.myForm.myTextarea.value +=
+        'CPU Cores = ' + n.hardwareConcurrency + '\n';
+
+    document.myForm.myTextarea.value +=
+        'Touch Points = ' + n.maxTouchPoints + '\n';
+
+    document.myForm.myTextarea.value +=
+        '\n--- FINGERPRINT COMPLETE ---\n';
+
+    document.myForm.myTextarea.value +=
+        'This is a demonstration fingerprint.\n';
+
+    document.myForm.myTextarea.value +=
+        'It is not a unique device identifier.\n';
+
+}
+
 </script></head>
 
 
@@ -453,7 +536,7 @@ Use the first 15 buttons to decide on what words to enter for the last 5 buttons
 <input type=button value="15 Show Cookies" onclick="{showCookies()}">
 <input type=button value="16 Browser Info" onclick="{browserInfo()}">
 <input type=button value="17 What Browser Knows" onclick="{browserKnowsYou()}">
-<input type=button value="18 " onclick="{myObjectData()}">
+<input type=button value="18 Browser Fingerprint" onclick="{browserFingerprint()}">
 <input type=button value="19 " onclick="{myObjectData()}">
 <input type=button value="20 " onclick="{myObjectData()}">
 <br>
