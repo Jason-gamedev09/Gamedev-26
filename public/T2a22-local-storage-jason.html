@@ -26,7 +26,7 @@ Text example: <input id="myText1" type=text size=70 value="" placeholder="Write 
    document.getElementById('myText1').value = localStorage.getItem('myStoredText')
 }"> 
 
-<h3>To-Do List (Make Sure You Click Store Text)</h3>
+<h3>To-Do List (Make Sure You Click Store Text</h3>
 
 <input id="myTodoInput" type="text" size="50" placeholder="Enter a new task...">
 
@@ -77,4 +77,29 @@ Text example: <input id="myText1" type=text size=70 value="" placeholder="Write 
    }
 </script>
 
+<h3>Player Profile (JSON Object Local Storage)</h3>
+
+Name: <input id="myPlayerName" type="text" placeholder="Enter name">
+Score: <input id="myPlayerScore" type="number" placeholder="0" style="width: 60px;">
+
+<input type="button" value="Save Profile" onClick="{
+   let player = {
+      name: document.getElementById('myPlayerName').value,
+      score: document.getElementById('myPlayerScore').value
+   };
+   localStorage.setItem('myPlayerProfile', JSON.stringify(player));
+   document.getElementById('myProfileDisplay').innerHTML = 'Saved: ' + player.name + ' (Score: ' + player.score + ')';
+}">
+
+<p id="myProfileDisplay">No profile saved yet.</p>
+
+<script>
+   let savedProfile = localStorage.getItem('myPlayerProfile');
+   if (savedProfile != null) {
+      let player = JSON.parse(savedProfile);
+      document.getElementById('myPlayerName').value = player.name;
+      document.getElementById('myPlayerScore').value = player.score;
+      document.getElementById('myProfileDisplay').innerHTML = 'Saved: ' + player.name + ' (Score: ' + player.score + ')';
+   }
+</script>
 </body>
