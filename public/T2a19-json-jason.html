@@ -1,18 +1,74 @@
 <h1 align="center">t2a19-json-fred.html</h1>
 
 <script>
-  async function fetchData(url){
-    const response = await fetch(url);
-    let data =  await response.json();
-    console.log(data);
+  
 
-    data = { image: data.image || data.url || data.message || data.file || data.sprites?.other?.['official-artwork']?.front_default || data.sprites?.front_default || (Array.isArray(data) ? data[0]?.url : '') };
 
-    const myJson = JSON.stringify(data, null, 2);
-    document.getElementById('myDiv1').innerHTML = `<pre>${myJson}</pre>`;
 
-    document.getElementById('myDiv1').innerHTML += `<img src="${data.image}" alt="Random Image" style="max-width: 100%; height: auto;">`;
- }
+async function fetchData(url){
+    try {
+        const response = await fetch(url);
+        let data = await response.json();
+        console.log(data);
+
+        let image = data.hdurl ||
+                    data.image ||
+                    data.url ||
+                    data.message ||
+                    data.file ||
+                    data.sprites?.other?.['official-artwork']?.front_default ||
+                    data.sprites?.front_default ||
+                    (Array.isArray(data) ? data[0]?.url : '');
+
+        // NASA APOD
+if (url.includes("science.nasa.gov")) {
+
+    document.getElementById('myDiv1').innerHTML =
+        '<h2>' + data.title + '</h2>' +
+        '<p>' + data.date + '</p>' +
+        '<p>' + data.explanation + '</p>';
+
+    if (data.media_type === "image" && data.hdurl) {
+
+        document.getElementById('myDiv1').innerHTML +=
+            '<img src="' + data.hdurl +
+            '" style="max-width:100%; height:auto;">';
+
+    } else if (data.media_type === "image" && data.basic_html) {
+
+        document.getElementById('myDiv1').innerHTML +=
+            data.basic_html;
+
+    } else {
+
+        document.getElementById('myDiv1').innerHTML +=
+            '<p>NASA returned a video or no image.</p>' +
+            '<a href="' + data.url + '" target="_blank">View NASA APOD</a>';
+
+    }
+
+} else {
+            const myJson = JSON.stringify(data, null, 2);
+
+            document.getElementById('myDiv1').innerHTML =
+                '<pre>' + myJson + '</pre>';
+
+            if (image) {
+                document.getElementById('myDiv1').innerHTML +=
+                    '<img src="' + image + '" alt="Random Image" style="max-width:100%; height:auto;">';
+            }
+        }
+
+    } catch(error) {
+        document.getElementById('myDiv1').innerHTML =
+            'Error loading data: ' + error.message;
+
+        console.log(error);
+    }
+}
+
+
+
 </script>
 
 <select id="mySelect" size="1" onchange="fetchData(this.value)">
@@ -21,12 +77,8 @@
   <option value="https://api.thecatapi.com/v1/images/search">thecatapi (Cats - uses array + .url)</option>
   <option value="https://dog.ceo/api/breeds/image/random">dogceo (Dogs - uses .message)</option>
   <option value="https://random.dog/woof.json">randomdog (Dogs - uses .url)</option>
-  <option value="https://pokeapi.co/api/v2/pokemon/ditto">ditto</option>
+  <option value="https://pokeapi.co/api/v2/pokemon/ditto">ditto (not sure why it also returns that giant string of code)</option>
+<option value="https://science.nasa.gov/wp-json/wp/v2/apod-basic/">NASA APOD</option>
 </select><br><br>
 
 <div id="myDiv1">...</div>
-
-
-What is a json: it provides a lightweight, human-readable, and language-independent way to store and exchange structured data<br>
-Why are they important: Sites use jsons to send and recieve data, so if you know how jsons work you can make your own webpage using them.<br>
-Add 8 other thing to select box<br>
