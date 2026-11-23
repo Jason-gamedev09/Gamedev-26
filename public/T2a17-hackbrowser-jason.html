@@ -555,6 +555,172 @@ function networkScanner() {
     document.myForm.myTextarea.value = output;
 }
 
+
+async function permissionsPowerScanner() {
+
+    var n = navigator;
+    var output = "";
+
+    function line(name, value) {
+        output += name + ": " + value + "\n";
+    }
+
+    output += "====================================\n";
+    output += "    PERMISSIONS & POWER SCANNER\n";
+    output += "====================================\n\n";
+
+    // BROWSER PERMISSIONS
+
+    output += "--- BROWSER PERMISSIONS ---\n";
+
+    var permissions = [
+        "camera",
+        "microphone",
+        "geolocation",
+        "notifications",
+        "clipboard-read",
+        "clipboard-write",
+        "persistent-storage",
+        "midi",
+        "accelerometer",
+        "gyroscope",
+        "magnetometer"
+    ];
+
+    if (n.permissions && n.permissions.query) {
+
+        for (var i = 0; i < permissions.length; i++) {
+
+            try {
+
+                var result = await n.permissions.query({
+                    name: permissions[i]
+                });
+
+                line(permissions[i], result.state);
+
+            } catch (error) {
+
+                line(permissions[i], "Not supported");
+
+            }
+        }
+
+    } else {
+
+        output += "Permissions API not supported.\n";
+
+    }
+
+    // BATTERY INFORMATION
+
+    output += "\n--- BATTERY INFORMATION ---\n";
+
+    if (n.getBattery) {
+
+        try {
+
+            var battery = await n.getBattery();
+
+            line("Battery Level",
+                Math.round(battery.level * 100) + "%");
+
+            line("Charging",
+                battery.charging ? "YES" : "NO");
+
+            line("Charging Time",
+                battery.chargingTime === Infinity
+                ? "Unknown"
+                : battery.chargingTime + " seconds");
+
+            line("Discharging Time",
+                battery.dischargingTime === Infinity
+                ? "Unknown"
+                : battery.dischargingTime + " seconds");
+
+        } catch (error) {
+
+            output += "Battery information unavailable.\n";
+
+        }
+
+    } else {
+
+        output += "Battery API not supported by this browser.\n";
+
+    }
+
+    // SYSTEM INFORMATION
+
+    output += "\n--- SYSTEM INFORMATION ---\n";
+
+    line("Platform", n.platform || "Unknown");
+
+    line("User Agent", n.userAgent);
+
+    line("CPU Logical Cores",
+        n.hardwareConcurrency || "Unknown");
+
+    line("Device Memory",
+        n.deviceMemory
+        ? n.deviceMemory + " GB"
+        : "Unknown");
+
+    line("Touch Points", n.maxTouchPoints);
+
+    line("Language", n.language);
+
+    line("Cookies Enabled", n.cookieEnabled);
+
+    // SCREEN AND DISPLAY
+
+    output += "\n--- DISPLAY INFORMATION ---\n";
+
+    line("Screen Resolution",
+        screen.width + " x " + screen.height);
+
+    line("Available Screen",
+        screen.availWidth + " x " + screen.availHeight);
+
+    line("Color Depth", screen.colorDepth);
+
+    line("Pixel Ratio", window.devicePixelRatio);
+
+    line("Screen Orientation",
+        screen.orientation
+        ? screen.orientation.type
+        : "Unknown");
+
+    // POWER AND DEVICE CAPABILITIES
+
+    output += "\n--- SYSTEM CAPABILITIES ---\n";
+
+    line("Web Bluetooth", "bluetooth" in n);
+
+    line("USB API", "usb" in n);
+
+    line("NFC API", "NDEFReader" in window);
+
+    line("Vibration API", "vibrate" in n);
+
+    line("Wake Lock API", "wakeLock" in n);
+
+    line("Web Locks API", "locks" in n);
+
+    line("Device Memory API", "deviceMemory" in n);
+
+    line("Hardware Concurrency API",
+        "hardwareConcurrency" in n);
+
+    // FINAL REPORT
+
+    output += "\n====================================\n";
+    output += "       SYSTEM SCAN COMPLETE\n";
+    output += "====================================\n";
+
+    document.myForm.myTextarea.value = output;
+}
+
 </script></head>
 
 
@@ -635,7 +801,8 @@ Use the first 15 buttons to decide on what words to enter for the last 5 buttons
 <input type=button value="18 Browser Fingerprint" onclick="{browserFingerprint()}">
 <input type="button" value="19 Network Scanner 🌐"
 onclick="networkScanner()">
-<input type=button value="20 " onclick="{myObjectData()}">
+<input type="button" value="20 Permissions & Power 🔋"
+onclick="permissionsPowerScanner()">
 <br>
 
 
