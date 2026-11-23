@@ -459,6 +459,102 @@ function browserFingerprint() {
 
 }
 
+
+function networkScanner() {
+
+    var n = navigator;
+    var c = n.connection ||
+            n.mozConnection ||
+            n.webkitConnection;
+
+    var output = "";
+
+    output += "====================================\n";
+    output += "       NETWORK INTELLIGENCE SCAN\n";
+    output += "====================================\n\n";
+
+    output += "--- CONNECTION STATUS ---\n";
+    output += "Online Status: " +
+        (n.onLine ? "ONLINE" : "OFFLINE") + "\n";
+
+    output += "Connection API: " +
+        (c ? "SUPPORTED" : "NOT SUPPORTED") + "\n";
+
+    if (c) {
+
+        output += "\n--- NETWORK DETAILS ---\n";
+
+        output += "Connection Type: " +
+            (c.type || "Not available") + "\n";
+
+        output += "Effective Type: " +
+            (c.effectiveType || "Not available") + "\n";
+
+        output += "Downlink Speed: " +
+            (c.downlink != null ? c.downlink + " Mbps" : "Unknown") + "\n";
+
+        output += "Estimated RTT: " +
+            (c.rtt != null ? c.rtt + " ms" : "Unknown") + "\n";
+
+        output += "Data Saver: " +
+            (c.saveData != null ? c.saveData : "Unknown") + "\n";
+
+        output += "Connection Change Support: " +
+            (typeof c.addEventListener == "function" ? "YES" : "NO") + "\n";
+
+    } else {
+
+        output += "\nYour browser does not expose detailed\n";
+        output += "network connection information.\n";
+
+    }
+
+    output += "\n--- BROWSER NETWORK CAPABILITIES ---\n";
+
+    output += "Online API: " +
+        (typeof n.onLine != "undefined") + "\n";
+
+    output += "Fetch API: " +
+        (typeof fetch == "function") + "\n";
+
+    output += "WebSocket: " +
+        (typeof WebSocket != "undefined") + "\n";
+
+    output += "WebRTC: " +
+        (typeof RTCPeerConnection != "undefined") + "\n";
+
+    output += "Service Worker: " +
+        ("serviceWorker" in n) + "\n";
+
+    output += "Network Timing API: " +
+        ("PerformanceObserver" in window) + "\n";
+
+    output += "\n--- INTERNET TEST ---\n";
+
+    output += "Current Website: " +
+        location.hostname + "\n";
+
+    output += "Protocol: " +
+        location.protocol + "\n";
+
+    output += "Page Port: " +
+        (location.port || "Default") + "\n";
+
+    output += "\n--- SCAN SUMMARY ---\n";
+
+    output += "Browser reports: " +
+        (n.onLine ? "NETWORK AVAILABLE" : "OFFLINE") + "\n";
+
+    output += "Note: Online status does not guarantee\n";
+    output += "that the internet is reachable.\n";
+
+    output += "\n====================================\n";
+    output += "          SCAN COMPLETE\n";
+    output += "====================================\n";
+
+    document.myForm.myTextarea.value = output;
+}
+
 </script></head>
 
 
@@ -537,7 +633,8 @@ Use the first 15 buttons to decide on what words to enter for the last 5 buttons
 <input type=button value="16 Browser Info" onclick="{browserInfo()}">
 <input type=button value="17 What Browser Knows" onclick="{browserKnowsYou()}">
 <input type=button value="18 Browser Fingerprint" onclick="{browserFingerprint()}">
-<input type=button value="19 " onclick="{myObjectData()}">
+<input type="button" value="19 Network Scanner 🌐"
+onclick="networkScanner()">
 <input type=button value="20 " onclick="{myObjectData()}">
 <br>
 
