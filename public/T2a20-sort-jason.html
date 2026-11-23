@@ -145,9 +145,48 @@
       myCurrentMax = myCards[myLoop]
       myLoop++
     } else {
-      // Eliminate the out-of-order card from the array
+
       myCards.splice(myLoop, 1)
     }
   }
   myShow()
+})()">
+
+<h3>Pancake Sort</h3>
+
+<input type=button value="Pancake Sort" onclick="(async () => {
+
+  for (let myOuter = myMax; myOuter > 1; myOuter--) {
+
+    let myMaxIndex = 0
+
+    for (let myLoop = 1; myLoop < myOuter; myLoop++) {
+      if (myCards[myLoop] > myCards[myMaxIndex]) {
+        myMaxIndex = myLoop
+      }
+    }
+
+    for (let myLoop = 0; myLoop < myMaxIndex; myLoop++) {
+      let myTemp = myCards[myLoop]
+      myCards[myLoop] = myCards[myMaxIndex]
+      myCards[myMaxIndex] = myTemp
+
+      myMaxIndex--
+      myShow(myLoop, myMaxIndex + 1)
+      await mySleep(300)
+    }
+
+    for (let myLoop = 0; myLoop < Math.floor(myOuter / 2); myLoop++) {
+      let myTemp = myCards[myLoop]
+      myCards[myLoop] = myCards[myOuter - 1 - myLoop]
+      myCards[myOuter - 1 - myLoop] = myTemp
+
+      myShow(myLoop, myOuter - 1 - myLoop)
+      await mySleep(300)
+    }
+
+  }
+
+  myShow()
+
 })()">
