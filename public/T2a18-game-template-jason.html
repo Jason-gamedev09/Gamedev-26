@@ -77,3 +77,7 @@ function myCheckHit(){
   myCheckHit()     // checks for all collisions
 }"><br><br>
 
+<input type=button value="Image down Fast Button" ontouchStart="{this.click(); event.preventDefault();}" onclick="{
+  document.getElementById('myImg01').style.top = parseInt(document.getElementById('myImg01').style.top) + 10 + 'px'
+  myCheckHit()     // checks for all collisions
+}"><br><br>
