@@ -65,6 +65,30 @@ if (url.includes("science.nasa.gov")) {
 
         console.log(error);
     }
+   // SLAVE I - TWO APIS
+if (url === "slave1") {
+
+    const response = await fetch(
+        "https://swapi.info/api/starships/21"
+    );
+
+    const data = await response.json();
+
+    const imageUrl =
+        "https://starwarsgallery.netlify.app/assets/starships/21.jpg";
+
+    document.getElementById('myDiv1').innerHTML =
+        '<h2>' + data.name + '</h2>' +
+        '<p>Model: ' + data.model + '</p>' +
+        '<p>Manufacturer: ' + data.manufacturer + '</p>' +
+        '<p>Length: ' + data.length + '</p>' +
+        '<p>Passengers: ' + data.passengers + '</p>' +
+        '<pre>' + JSON.stringify(data, null, 2) + '</pre>' +
+        '<img src="' + imageUrl +
+        '" style="max-width:100%; height:auto;">';
+
+    return;
+}
 }
 
 
@@ -80,7 +104,7 @@ if (url.includes("science.nasa.gov")) {
   <option value="https://pokeapi.co/api/v2/pokemon/ditto">ditto (not sure why it also returns that giant string of code)</option>
 <option value="https://science.nasa.gov/wp-json/wp/v2/apod-basic/">NASA APOD</option>
 <option value="https://swapi.py4e.com/api/people/1/">Star Wars chracter information</option>
-<option value="https://swapi.py4e.com/api/starships/21/">Star Wars ship information</option>
+<option value="slave1">Slave I - Boba/Jango Fett</option>
 </select><br><br>
 
 <div id="myDiv1">...</div>
