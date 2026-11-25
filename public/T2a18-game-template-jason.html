@@ -42,7 +42,16 @@ function myCheckHit(){
        location = 't2a13-keydown.html' 
        }// go to your next level
    }
-   if ( myHitOther('myImg01','myImg03') ){
+   if (myHitOther('myImg01','myImg03')){
+        alert('You defeated the enemy!')
+        document.getElementById('myImg03').style.display = 'none'
+    } else {
+        alert('You missed!')
+    }
+
+    myAttack = 0
+}">
+   if ( myHitOther('myImg01','myImg05') ){
        alert('TEST ALERT: you lose (you hit enemy img3)')  
        document.getElementById('myImg01').style.left = '20px'
    }
@@ -63,7 +72,8 @@ function myCheckHit(){
 <img id="myImg02" style="position:absolute; width:100px; height:80px; top:600px; left:350px;" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcToPMAtFX46ETmjJhYcIpCPpURk0MjNio0PAj5t56_T3g&s=10">
 <img id="myImg03" style="position:absolute; width:100px; height:80px; top:750px; left:250px;" src="https://i.pinimg.com/736x/9b/1b/df/9b1bdf645fd086068e79988d4719bdae.jpg">
 <img id="myImg04" style="position:absolute; width:100px; height:80px; top:550px; left:70px;" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQIH-AjRrWzD3-Fncos_PZSKYRGony0lXjA8u_XKORipg&s=10">
-   
+<img id="myImg05" style="position:absolute; width:100px; height:80px; top:450px; left:170px;" src="">
+
 <input type=button value="Auto Background Left" onclick="{
   clearInterval(myClock)
   let myTemp = '100px 0px'
@@ -95,3 +105,8 @@ function myCheckHit(){
   document.getElementById('myImg01').style.top = parseInt(document.getElementById('myImg01').style.top) + 10 + 'px'
   myCheckHit()     // checks for all collisions
 }"><br><br>
+
+<input type="button" value="ATTACK" onclick="{
+    myAttack = 1
+}
+   
