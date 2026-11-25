@@ -5,6 +5,7 @@
 
 <h1 align=center>t2a18-game-template-fred</h1>
 <h2 align=center>Added Third image with collision check</h2>
+<h3 id="keyCounter">Keys: 0</h3>
 <br><br><br><br>
 
 <script>
@@ -12,7 +13,7 @@
    // global variables here
    let myGlobalX = 0
    let myClock
-
+   let myKey = 0
 
    // global functions here
 function myHitOther(my1,my2){
@@ -43,7 +44,13 @@ function myCheckHit(){
        alert('TEST ALERT: you lose (you hit enemy img3)')  
        document.getElementById('myImg01').style.left = '20px'
    }
-   
+   if (myHitOther('myImg01','myImg04')){
+    myKey = 1
+    document.getElementById('keyCounter').innerHTML = 'Keys: ' + myKey
+
+    document.getElementById('myImg04').style.display = 'none'
+}
+   }
    // more if statements here like the above
 
 }  // end of myCheckHit()
