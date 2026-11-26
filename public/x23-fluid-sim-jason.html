@@ -1,1 +1,543 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fluid Laboratory</title>
+<style>
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 24px;
+  background: #080b10;
+  color: #e8edf5;
+  font-family: system-ui, sans-serif;
+}
+
+main {
+  max-width: 900px;
+  margin: auto;
+}
+
+h1 { font-size: 25px; margin-bottom: 5px; }
+p { color: #8995a6; font-size: 13px; }
+
+.stage {
+  position: relative;
+  margin-top: 22px;
+  border: 1px solid #252d39;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #080b10;
+}
+
+canvas {
+  display: block;
+  width: 100%;
+  height: 480px;
+  cursor: crosshair;
+  touch-action: none;
+}
+
+.overlay {
+  position: absolute;
+  top: 14px;
+  left: 15px;
+  font-size: 11px;
+  color: #aeb9c9;
+  pointer-events: none;
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-top: 14px;
+}
+
+button {
+  background: #151b25;
+  border: 1px solid #303a49;
+  color: white;
+  padding: 10px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+button:hover, button.active {
+  background: #27364a;
+  border-color: #7295c5;
+}
+
+.settings {
+  display: grid;
+  grid-template-columns: repeat(auto-fit,minmax(180px,1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.setting {
+  background: #111720;
+  padding: 13px;
+  border: 1px solid #252d39;
+  border-radius: 9px;
+}
+
+.setting label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  margin-bottom: 12px;
+}
+
+input[type=range] {
+  width: 100%;
+  accent-color: #72baff;
+}
+
+.colors {
+  display: flex;
+  gap: 13px;
+  align-items: center;
+  margin-top: 18px;
+}
+
+.swatch {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  padding: 0;
+  border: 2px solid transparent;
+}
+
+.swatch.active {
+  outline: 2px solid white;
+  outline-offset: 3px;
+}
+
+.status {
+  font-size: 12px;
+  color: #8c9aad;
+  margin-top: 12px;
+}
+</style>
+</head>
+
+<body>
+<main>
+  <h1>Fluid Laboratory</h1>
+  <p>Interactive particle-based fluid simulation</p>
+
+  <div class="stage">
+    <canvas id="canvas"></canvas>
+    <div class="overlay">FLUID SIMULATION / LIVE</div>
+  </div>
+
+  <div class="status" id="status">
+    ● SIMULATION RUNNING
+  </div>
+
+  <div class="controls">
+    <button id="pause">Ⅱ Pause</button>
+    <button id="clear">Clear</button>
+    <button id="burst">✳ Random burst</button>
+    <button id="reset">↻ Reset</button>
+  </div>
+
+  <div class="settings">
+    <div class="setting">
+      <label>Viscosity <span id="viscValue">50%</span></label>
+      <input id="visc" type="range" min="0" max="100" value="50">
+    </div>
+
+    <div class="setting">
+      <label>Brush size <span id="brushValue">45</span></label>
+      <input id="brush" type="range" min="10" max="110" value="45">
+    </div>
+
+    <div class="setting">
+      <label>Flow speed <span id="speedValue">100%</span></label>
+      <input id="speed" type="range" min="20" max="200" value="100">
+    </div>
+  </div>
+
+  <div class="colors">
+    <span style="font-size:12px">Color:</span>
+    <button class="swatch active" data-color="rainbow"
+      style="background:linear-gradient(135deg,#23c8ff,#a855f7,#ff6caa)"></button>
+    <button class="swatch" data-color="blue" style="background:#28aaff"></button>
+    <button class="swatch" data-color="purple" style="background:#ac75ff"></button>
+    <button class="swatch" data-color="green" style="background:#3cdbab"></button>
+    <button class="swatch" data-color="white" style="background:#eee"></button>
+  </div>
+
+  <div class="controls">
+    <button id="push" class="active">Push mode</button>
+    <button id="attract">Attract mode</button>
+    <button id="swirl">Swirl mode</button>
+  </div>
+
+  <p>Click and drag to move the fluid. Experiment with the settings!</p>
+</main>
+
+<script>
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+let W, H, particles = [];
+let running = true;
+let frame = 0;
+
+let viscosity = 0.5;
+let brush = 45;
+let speed = 1;
+let mode = "push";
+let color = "rainbow";
+
+const pointer = {
+  x: 0, y: 0,
+  down: false,
+  inside: false
+};
+
+const colors = {
+  blue: [40,170,255],
+  purple: [172,117,255],
+  green: [60,219,171],
+  white: [230,240,255]
+};
+
+// Canvas sizing
+function resize() {
+  const rect = canvas.getBoundingClientRect();
+
+  const oldW = W || rect.width;
+  const oldH = H || rect.height;
+
+  W = rect.width;
+  H = rect.height;
+
+  const dpr = Math.min(devicePixelRatio || 1, 2);
+
+  canvas.width = W * dpr;
+  canvas.height = H * dpr;
+
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+  if (oldW && oldH) {
+    particles.forEach(p => {
+      p.x *= W / oldW;
+      p.y *= H / oldH;
+    });
+  }
+}
+
+// Create particles
+function spawn(x, y, vx, vy, amount = 1) {
+  for (let i = 0; i < amount && particles.length < 5200; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const radius = Math.random() * brush * 0.3;
+
+    particles.push({
+      x: x + Math.cos(angle) * radius,
+      y: y + Math.sin(angle) * radius,
+      vx: vx + (Math.random() - 0.5) * 1.8,
+      vy: vy + (Math.random() - 0.5) * 1.8,
+      age: 0,
+      life: 1200 + Math.random() * 500,
+      h: Math.random() * 360
+    });
+  }
+}
+
+// Initial fluid
+function initial() {
+  particles = [];
+
+  for (let i = 0; i < 1500; i++) {
+    const angle = Math.random() * Math.PI * 2;
+
+    particles.push({
+      x: W * (0.2 + Math.random() * 0.6),
+      y: H * (0.2 + Math.random() * 0.6),
+      vx: Math.cos(angle) * 0.4,
+      vy: Math.sin(angle) * 0.4,
+      age: 0,
+      life: 1700,
+      h: Math.random() * 360
+    });
+  }
+}
+
+// Random explosion
+function burst() {
+  for (let i = 0; i < 10; i++) {
+    const x = Math.random() * W;
+    const y = Math.random() * H;
+    const angle = Math.random() * Math.PI * 2;
+
+    spawn(
+      x, y,
+      Math.cos(angle) * 5,
+      Math.sin(angle) * 5,
+      130
+    );
+  }
+}
+
+// Particle colors
+function getColor(p) {
+  if (color === "rainbow") {
+    return `hsla(${(p.h + frame * 0.25) % 360},95%,65%,`;
+  }
+
+  return `rgba(${colors[color].join(",")},`;
+}
+
+// Main simulation
+function draw() {
+  ctx.globalCompositeOperation = "source-over";
+  ctx.fillStyle = "rgba(8,11,16,0.18)";
+  ctx.fillRect(0, 0, W, H);
+
+  ctx.globalCompositeOperation = "lighter";
+
+  const damp = 0.992 - viscosity * 0.006;
+
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const p = particles[i];
+
+    // Mouse interaction
+    if (pointer.down) {
+      const dx = pointer.x - p.x;
+      const dy = pointer.y - p.y;
+
+      const dist = Math.sqrt(dx * dx + dy * dy);
+
+      if (dist < brush && dist > 1) {
+        const force = (1 - dist / brush) * 0.18 * speed;
+
+        if (mode === "push") {
+          p.vx -= dx / dist * force;
+          p.vy -= dy / dist * force;
+        }
+
+        if (mode === "attract") {
+          p.vx += dx / dist * force;
+          p.vy += dy / dist * force;
+        }
+
+        if (mode === "swirl") {
+          p.vx -= dy / dist * force * 2.1;
+          p.vy += dx / dist * force * 2.1;
+        }
+      }
+    }
+
+    // Ambient fluid currents
+    const fx =
+      Math.sin(p.y * 0.009 + frame * 0.009) * 0.022 +
+      Math.cos(p.x * 0.012 - frame * 0.006) * 0.015;
+
+    const fy =
+      Math.cos(p.x * 0.009 + frame * 0.008) * 0.022 +
+      Math.sin(p.y * 0.012) * 0.015;
+
+    p.vx = (p.vx + fx * speed) * damp;
+    p.vy = (p.vy + fy * speed) * damp;
+
+    p.x += p.vx * speed;
+    p.y += p.vy * speed;
+
+    // Boundary collisions
+    if (p.x < 1) {
+      p.x = 1;
+      p.vx = Math.abs(p.vx) * 0.8;
+    }
+
+    if (p.x > W - 1) {
+      p.x = W - 1;
+      p.vx = -Math.abs(p.vx) * 0.8;
+    }
+
+    if (p.y < 1) {
+      p.y = 1;
+      p.vy = Math.abs(p.vy) * 0.8;
+    }
+
+    if (p.y > H - 1) {
+      p.y = H - 1;
+      p.vy = -Math.abs(p.vy) * 0.8;
+    }
+
+    p.age++;
+
+    if (p.age > p.life) {
+      particles.splice(i, 1);
+      continue;
+    }
+
+    const alpha = Math.min(1, (p.life - p.age) / 100, 0.9);
+
+    ctx.strokeStyle = getColor(p) + alpha + ")";
+    ctx.lineWidth =
+      1.3 + Math.min(2, Math.abs(p.vx) + Math.abs(p.vy)) * 0.35;
+
+    ctx.beginPath();
+    ctx.moveTo(p.x - p.vx * 2, p.y - p.vy * 2);
+    ctx.lineTo(p.x, p.y);
+    ctx.stroke();
+  }
+
+  // Brush indicator
+  if (pointer.inside) {
+    ctx.beginPath();
+    ctx.arc(pointer.x, pointer.y, brush, 0, Math.PI * 2);
+    ctx.strokeStyle = "rgba(220,230,245,0.3)";
+    ctx.setLineDash([3, 5]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  ctx.globalCompositeOperation = "source-over";
+  frame++;
+}
+
+// Animation loop
+function animate() {
+  requestAnimationFrame(animate);
+
+  if (running) draw();
+}
+
+// Pointer interaction
+function getPosition(e) {
+  const rect = canvas.getBoundingClientRect();
+
+  return {
+    x: e.clientX - rect.left,
+    y: e.clientY - rect.top
+  };
+}
+
+canvas.addEventListener("pointerdown", e => {
+  const p = getPosition(e);
+
+  pointer.x = p.x;
+  pointer.y = p.y;
+  pointer.down = true;
+  pointer.inside = true;
+
+  canvas.setPointerCapture(e.pointerId);
+
+  spawn(p.x, p.y, 0, 0, 18);
+});
+
+canvas.addEventListener("pointermove", e => {
+  const p = getPosition(e);
+
+  const dx = p.x - pointer.x;
+  const dy = p.y - pointer.y;
+
+  pointer.x = p.x;
+  pointer.y = p.y;
+  pointer.inside = true;
+
+  if (pointer.down) {
+    spawn(
+      p.x, p.y,
+      dx * 0.3,
+      dy * 0.3,
+      Math.min(18, Math.ceil(Math.hypot(dx, dy) * 0.3) + 2)
+    );
+  }
+});
+
+function release() {
+  pointer.down = false;
+}
+
+canvas.addEventListener("pointerup", release);
+canvas.addEventListener("pointercancel", release);
+canvas.addEventListener("pointerleave", () => {
+  pointer.inside = false;
+  release();
+});
+
+// Controls
+document.getElementById("pause").onclick = e => {
+  running = !running;
+  e.target.textContent = running ? "Ⅱ Pause" : "▶ Resume";
+  document.getElementById("status").textContent =
+    running ? "● SIMULATION RUNNING" : "Ⅱ SIMULATION PAUSED";
+};
+
+document.getElementById("clear").onclick = () => {
+  particles = [];
+  ctx.clearRect(0, 0, W, H);
+};
+
+document.getElementById("burst").onclick = burst;
+
+document.getElementById("reset").onclick = () => {
+  initial();
+  running = true;
+  document.getElementById("pause").textContent = "Ⅱ Pause";
+  document.getElementById("status").textContent = "● SIMULATION RUNNING";
+};
+
+// Sliders
+document.getElementById("visc").oninput = e => {
+  viscosity = e.target.value / 100;
+  document.getElementById("viscValue").textContent = e.target.value + "%";
+};
+
+document.getElementById("brush").oninput = e => {
+  brush = +e.target.value;
+  document.getElementById("brushValue").textContent = brush;
+};
+
+document.getElementById("speed").oninput = e => {
+  speed = e.target.value / 100;
+  document.getElementById("speedValue").textContent = e.target.value + "%";
+};
+
+// Colors
+document.querySelectorAll(".swatch").forEach(button => {
+  button.onclick = () => {
+    color = button.dataset.color;
+
+    document.querySelectorAll(".swatch").forEach(b => {
+      b.classList.toggle("active", b === button);
+    });
+  };
+});
+
+// Interaction modes
+const modes = ["push", "attract", "swirl"];
+
+modes.forEach(m => {
+  document.getElementById(m).onclick = () => {
+    mode = m;
+
+    modes.forEach(name => {
+      document.getElementById(name).classList.toggle(
+        "active", name === m
+      );
+    });
+  };
+});
+
+// Start
+const observer = new ResizeObserver(resize);
+observer.observe(canvas);
+
+resize();
+initial();
+burst();
+animate();
+</script>
+</body>
+</html>
